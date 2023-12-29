@@ -8,5 +8,5 @@ line_length = 100
 skip_gitignore = true
 known_local_folder = [
     "tests",
-    "src"
+    "data_pipelines",
 ]

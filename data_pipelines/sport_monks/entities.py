@@ -1,6 +1,6 @@
 import attr
 
-from src.common.entity import IEntity
+from data_pipelines.common.entity import IEntity
 
 
 class Player(IEntity):

@@ -1,7 +1,7 @@
 ---
 x-airflow-common:
   &airflow-common
-  image: ${AIRFLOW_IMAGE_NAME:-apache/airflow:2.8.0}
+  image: ${AIRFLOW_IMAGE_NAME:-apache/airflow:2.8.0-python3.10}
   environment:
     &airflow-common-env
     AIRFLOW__CORE__EXECUTOR: CeleryExecutor
@@ -10,15 +10,21 @@ x-airflow-common:
     AIRFLOW__CELERY__BROKER_URL: redis://:@redis:6379/0
     AIRFLOW__CORE__FERNET_KEY: ''
     AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: 'true'
-    AIRFLOW__CORE__LOAD_EXAMPLES: 'true'
+    AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
     AIRFLOW__API__AUTH_BACKENDS: 'airflow.api.auth.backend.basic_auth,airflow.api.auth.backend.session'
     AIRFLOW__SCHEDULER__ENABLE_HEALTH_CHECK: 'true'
     _PIP_ADDITIONAL_REQUIREMENTS: ${_PIP_ADDITIONAL_REQUIREMENTS:-}
+    PYTHONPATH: "${PYTHONPATH:-}:/opt/airflow"
+
   volumes:
-    - ${AIRFLOW_PROJ_DIR:-.}/src/dags:/opt/airflow/dags
+    - ${AIRFLOW_PROJ_DIR:-.}/airflow_config/dags:/opt/airflow/dags
+    - ${AIRFLOW_PROJ_DIR:-.}/data_pipelines:/opt/airflow/data_pipelines
     - ${AIRFLOW_PROJ_DIR:-.}/airflow_config/logs:/opt/airflow/logs
     - ${AIRFLOW_PROJ_DIR:-.}/airflow_config/config:/opt/airflow/config
     - ${AIRFLOW_PROJ_DIR:-.}/airflow_config/plugins:/opt/airflow/plugins
+    - ${AIRFLOW_PROJ_DIR:-.}/airflow_dags_entry_point.sh:/opt/airflow/airflow_dags_entry_point.sh
+  entrypoint: [ "/opt/airflow/airflow_dags_entry_point.sh" ]
+
   user: "${AIRFLOW_UID:-50000}:0"
   depends_on:
     &airflow-common-depends-on
@@ -207,7 +213,7 @@ services:
       _PIP_ADDITIONAL_REQUIREMENTS: ''
     user: "0:0"
     volumes:
-      - ${AIRFLOW_PROJ_DIR:-.}:/sources
+      - ${AIRFLOW_PROJ_DIR:-.}/airflow_config/sources:/sources
 
   airflow-cli:
     <<: *airflow-common
