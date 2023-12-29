@@ -53,7 +53,6 @@ services:
     restart: always
 
   mongodb:
-
     container_name: "mongodb_ba"
     image: mongo:4.4.8
     volumes:
@@ -62,10 +61,8 @@ services:
         -  ${AIRFLOW_PROJ_DIR:-.}/mongo_volumes/configdb:/data/configdb
     ports:
       - "27017:27017"
-    environment:
-      - MONGO_INITDB_DATABASE=admin
-      - MONGO_INITDB_ROOT_USERNAME=admin
-      - MONGO_INITDB_ROOT_PASSWORD=root
+    env_file:
+      - ${AIRFLOW_PROJ_DIR:-.}/config/.env
 
     healthcheck:
         test: ["CMD", "mongo", "--eval", "db.adminCommand('ping')"]

@@ -1,7 +1,8 @@
 fastapi==0.108.0
 uvicorn==0.25.0
-starlette==0.34.0
+starlette<=0.33.0,>=0.29.0
 attrs==23.1.0
+cattrs==23.2.3
 requests==2.31.0
 python-dotenv==1.0.0
 apache-airflow==2.8.0

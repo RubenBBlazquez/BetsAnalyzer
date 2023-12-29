@@ -1,6 +1,6 @@
 db.createUser(
     {
-        "user": "admin",
+        "user": "bets_analyzer",
         "pwd": "bets_analyzer",
         "roles": [
             {
