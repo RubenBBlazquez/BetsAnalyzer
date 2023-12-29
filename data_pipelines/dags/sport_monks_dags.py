@@ -1,6 +1,6 @@
-from data_pipelines.sport_monks.dag_builder import SportMonksDownloadDagBuilder
-from data_pipelines.sport_monks.sport_monks_client import SportMonksGetEndpoints
+# *-* airflow DAG script *-*
 
-globals()["sport_monks_dags"] = SportMonksDownloadDagBuilder(
-    SportMonksGetEndpoints.PLAYERS, None
-).build()
+from data_pipelines.sport_monks.dag_builder import build_sport_monks_dags
+
+for dag in build_sport_monks_dags():
+    globals()[dag.dag_id] = dag

@@ -11,8 +11,7 @@ class MongoDBWriter(IWriter):
     Class for writing data to MongoDB
     """
 
-    _collection_name: str
     _database_name: str
 
-    def write(self, entities: Iterable[IEntity]):
+    def write(self, entities: Iterable[IEntity], collection: str):
         pass

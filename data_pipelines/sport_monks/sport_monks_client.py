@@ -7,7 +7,7 @@ import attr
 from data_pipelines.common.api_client_base import ApiClientBase
 
 
-class SportMonksGetEndpoints(Enum):
+class SportMonksCollections(Enum):
     """
     Enum for SportMonks API endpoints to get and download data
     """
@@ -37,7 +37,5 @@ class SportMonksClient(ApiClientBase):
                 params={"api_token": self.api_key, "page": next_page},
             )
             next_page = response["pagination"]["next_page"]
-            import web_pdb
 
-            web_pdb.set_trace()
             yield from response["data"]

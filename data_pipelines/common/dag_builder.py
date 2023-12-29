@@ -25,7 +25,7 @@ class DagCollector:
 
     _builders: list[IDagBuilder] = attr.ib(factory=lambda: [], init=False)
 
-    def add_dag(self, dag_builder: IDagBuilder):
+    def add_builder(self, dag_builder: IDagBuilder):
         """
         Method to add DAG to collector
         """
