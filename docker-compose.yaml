@@ -15,12 +15,15 @@ x-airflow-common:
     AIRFLOW__SCHEDULER__ENABLE_HEALTH_CHECK: 'true'
     _PIP_ADDITIONAL_REQUIREMENTS: ${_PIP_ADDITIONAL_REQUIREMENTS:-}
     PYTHONPATH: "${PYTHONPATH:-}:/opt/airflow"
+  env_file:
+    - ${AIRFLOW_PROJ_DIR:-.}/config/.env
 
   volumes:
     - ${AIRFLOW_PROJ_DIR:-.}/airflow_config/dags:/opt/airflow/dags
     - ${AIRFLOW_PROJ_DIR:-.}/data_pipelines:/opt/airflow/data_pipelines
     - ${AIRFLOW_PROJ_DIR:-.}/airflow_config/logs:/opt/airflow/logs
     - ${AIRFLOW_PROJ_DIR:-.}/airflow_config/config:/opt/airflow/config
+    - ${AIRFLOW_PROJ_DIR:-.}/config/.env:/opt/airflow/config/.env
     - ${AIRFLOW_PROJ_DIR:-.}/airflow_config/plugins:/opt/airflow/plugins
     - ${AIRFLOW_PROJ_DIR:-.}/airflow_dags_entry_point.sh:/opt/airflow/airflow_dags_entry_point.sh
   entrypoint: [ "/opt/airflow/airflow_dags_entry_point.sh" ]
