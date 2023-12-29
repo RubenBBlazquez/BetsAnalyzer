@@ -63,7 +63,6 @@ services:
       - "27017:27017"
     env_file:
       - ${AIRFLOW_PROJ_DIR:-.}/config/.env
-
     healthcheck:
         test: ["CMD", "mongo", "--eval", "db.adminCommand('ping')"]
         interval: 10s

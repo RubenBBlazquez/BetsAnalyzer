@@ -13,8 +13,8 @@ class Player(IEntity):
     Entity that represents a player in sportmonks API
     """
 
-    id: Optional[int]
-    sport_id: Optional[int]
+    id: int
+    sport_id: int
     country_id: Optional[int]
     nationality_id: Optional[int]
     city_id: Optional[int]
@@ -31,6 +31,29 @@ class Player(IEntity):
     weight: Optional[int]
     date_of_birth: str
     gender: str
+
+    def to_dict(self) -> dict:
+        return attr.asdict(self)
+
+
+@attr.s(auto_attribs=True)
+class Leagues(IEntity):
+    """
+    Entity that represents a league in sportmonks API
+    """
+
+    id: int
+    sport_id: int
+    country_id: int
+    name: str
+    active: bool
+    short_code: str
+    image_path: str
+    type: str
+    sub_type: str
+    last_played_at: str
+    category: Optional[int]
+    has_jerseys: bool
 
     def to_dict(self) -> dict:
         return attr.asdict(self)

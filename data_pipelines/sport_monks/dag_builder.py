@@ -8,25 +8,11 @@ from airflow.operators.python import PythonOperator
 from data_pipelines.common.dag_builder import DagCollector, IDagBuilder
 from data_pipelines.common.writers.mongodb_writer import MongoDBWriter
 from data_pipelines.common.writers.writer import IWriter
-from data_pipelines.sport_monks.sport_monks_client import SportMonksClient, SportMonksCollections
-
-
-def get_sport_monks_downloader(collection: SportMonksCollections) -> callable:
-    """
-    Function to get downloader callable for SportMonks API
-
-    Parameters
-    ----------
-    collection: SportMonksCollections
-        collection where want to download data
-    """
-    sport_monks_client = SportMonksClient()
-
-    switcher = {
-        SportMonksCollections.PLAYERS: sport_monks_client.get_players,
-    }
-
-    return switcher[collection]
+from data_pipelines.sport_monks.sport_monks_client import (
+    ENTITY_SWITCHER,
+    SportMonksClient,
+    SportMonksCollections,
+)
 
 
 @attr.s(auto_attribs=True)
@@ -42,9 +28,11 @@ class SportMonksDownloadDagBuilder(IDagBuilder):
         """
         Method to download and save data
         """
-        downloader_callable = get_sport_monks_downloader(self._collection)
+        sport_monks_client = SportMonksClient()
+        entity = ENTITY_SWITCHER[self._collection]
+        iterator = sport_monks_client.get_data_in_batches(self._collection, entity)
 
-        for data in downloader_callable():
+        for data in iterator:
             self._writer.write(data, self._collection.value)
 
     def build(self):
