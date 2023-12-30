@@ -40,3 +40,7 @@ class Player(DownloaderEntityBase):
         list of includes
         """
         return ["position", "teams", "latest"]
+
+    @staticmethod
+    def get_endpoint() -> str:
+        return "players"

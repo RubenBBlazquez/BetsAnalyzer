@@ -166,3 +166,7 @@ class Match(DownloaderEntityBase):
         list of includes
         """
         return ["formations", "scores", "venue", "lineups", "weatherReport"]
+
+    @staticmethod
+    def get_endpoint() -> str:
+        return "fixtures"

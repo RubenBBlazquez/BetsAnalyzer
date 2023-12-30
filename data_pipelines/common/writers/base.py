@@ -1,14 +1,16 @@
 from abc import ABC
 
+import attr
 import pandas as pd
 
 
+@attr.s(auto_attribs=True)
 class IWriter(ABC):
     """
     Interface for writer
     """
 
-    def write(self, entities: pd.DataFrame, collection: str):
+    def write(self, entities: pd.DataFrame):
         """
         Abstract method to write data in some database/storage
 
@@ -16,7 +18,5 @@ class IWriter(ABC):
         ----------
         entities: pd.DataFrame
             List of entities to write
-        collection: str
-            Name of collection/table to write data
         """
         raise NotImplementedError()

@@ -26,3 +26,7 @@ class Country(DownloaderEntityBase):
     @staticmethod
     def get_middle_endpoint() -> str:
         return "core"
+
+    @staticmethod
+    def get_endpoint() -> str:
+        return "countries"

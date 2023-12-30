@@ -23,3 +23,7 @@ class League(DownloaderEntityBase):
     last_played_at: str
     category: Optional[int]
     has_jerseys: bool
+
+    @staticmethod
+    def get_endpoint() -> str:
+        return "leagues"

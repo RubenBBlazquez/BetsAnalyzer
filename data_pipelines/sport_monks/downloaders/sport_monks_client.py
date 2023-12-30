@@ -14,7 +14,7 @@ from sport_monks.downloaders.entities.type import Type
 from data_pipelines.common.api_client_base import ApiClientBase
 
 
-class SportMonksCollections(Enum):
+class SportMonksEndpoints(Enum):
     """
     Enum for SportMonks API endpoints to get and download data
     """
@@ -27,13 +27,24 @@ class SportMonksCollections(Enum):
     TYPES = "types"
 
 
+DATABASE_NAME = "sport_monks"
+
+RAW_DATA_COLLECTIONS_SWITCHER = {
+    SportMonksEndpoints.PLAYERS: "raw_data_players",
+    SportMonksEndpoints.LEAGUES: "raw_data_leagues",
+    SportMonksEndpoints.TEAMS: "raw_data_teams",
+    SportMonksEndpoints.MATCHES: "raw_data_matches",
+    SportMonksEndpoints.COUNTRIES: "raw_data_countries",
+    SportMonksEndpoints.TYPES: "raw_data_types",
+}
+
 DOWNLOADER_ENTITY_SWITCHER = {
-    SportMonksCollections.PLAYERS: Player,
-    SportMonksCollections.LEAGUES: League,
-    SportMonksCollections.TEAMS: Team,
-    SportMonksCollections.MATCHES: Match,
-    SportMonksCollections.COUNTRIES: Country,
-    SportMonksCollections.TYPES: Type,
+    SportMonksEndpoints.PLAYERS: Player,
+    SportMonksEndpoints.LEAGUES: League,
+    SportMonksEndpoints.TEAMS: Team,
+    SportMonksEndpoints.MATCHES: Match,
+    SportMonksEndpoints.COUNTRIES: Country,
+    SportMonksEndpoints.TYPES: Type,
 }
 
 
@@ -47,16 +58,14 @@ class SportMonksClient(ApiClientBase):
         self.api_key = os.getenv("SPORT_MONKS_API_KEY", default="")
         self.api_url = os.getenv("SPORT_MONKS_BASE_URL", default="")
 
-    def get_data_in_batches(
-        self, collection: SportMonksCollections, entity: DownloaderEntityBase
-    ) -> Iterator[Any]:
+    def get_data_in_batches(self, entity: DownloaderEntityBase) -> Iterator[Any]:
         has_more_pages = True
         page = 1
         per_page = 50
 
         while has_more_pages:
             response = self.get(
-                url=f"{self.api_url}/{entity.get_middle_endpoint()}/{collection.value}",
+                url=f"{self.api_url}/{entity.get_middle_endpoint()}/{entity.get_endpoint()}",
                 params={
                     "api_token": self.api_key,
                     "page": page,

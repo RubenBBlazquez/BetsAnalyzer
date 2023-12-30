@@ -1,26 +1,16 @@
+from __future__ import annotations
+
 from copy import deepcopy
 
 import attr
 import cattrs
-from common.entity_base import IEntity
 
 
 @attr.s(auto_attribs=True)
-class DownloaderEntityBase(IEntity):
+class DownloaderEntityBase:
     """
-    Base Entity class
+    Base Downloader Entity information
     """
-
-    @staticmethod
-    def get_includes() -> list[str]:
-        """
-        method to obtain includes in sportMonks for each entity
-
-        Returns
-        -------
-        list of includes
-        """
-        return []
 
     def to_dict(self) -> dict:
         """
@@ -33,7 +23,7 @@ class DownloaderEntityBase(IEntity):
         return attr.asdict(self)
 
     @classmethod
-    def from_dict(cls, dict_: dict) -> IEntity:
+    def from_dict(cls, dict_: dict) -> DownloaderEntityBase:
         """
         method to cast dict to entity
 
@@ -54,3 +44,25 @@ class DownloaderEntityBase(IEntity):
         middle endpoint
         """
         return "football"
+
+    @staticmethod
+    def get_endpoint() -> str:
+        """
+        middle endpoint to obtain data in sportMonks for each entity
+
+        Returns
+        -------
+        middle endpoint
+        """
+        raise NotImplementedError()
+
+    @staticmethod
+    def get_includes() -> list[str]:
+        """
+        method to obtain includes in sportMonks for each entity
+
+        Returns
+        -------
+        list of includes
+        """
+        return []
