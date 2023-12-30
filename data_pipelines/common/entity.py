@@ -1,4 +1,10 @@
+from __future__ import annotations
+
 from abc import ABC, abstractmethod
+from copy import deepcopy
+
+import attr
+import cattrs
 
 
 class IEntity(ABC):
@@ -16,4 +22,45 @@ class IEntity(ABC):
         -------
         dict representation of entity
         """
-        pass
+        raise NotImplementedError()
+
+    @classmethod
+    @abstractmethod
+    def from_dict(cls, dict_: dict) -> IEntity:
+        """
+        method to cast dict to entity
+
+        Returns
+        -------
+        entity
+        """
+        raise NotImplementedError()
+
+
+@classmethod
+class EntityBase(ABC):
+    """
+    Base Entity class
+    """
+
+    def to_dict(self) -> dict:
+        """
+        method to convert entity to dict
+
+        Returns
+        -------
+        dict representation of entity
+        """
+        return attr.asdict(self)
+
+    @classmethod
+    def from_dict(cls, dict_: dict) -> IEntity:
+        """
+        method to cast dict to entity
+
+        Returns
+        -------
+        entity
+        """
+        converter = deepcopy(cattrs.global_converter)
+        return converter.structure(dict_, cls)

@@ -1,10 +1,9 @@
 import os
-from copy import deepcopy
 from enum import Enum
 from typing import Any, Iterator
 
 import attr
-import cattrs
+from common.entity import IEntity
 
 from data_pipelines.common.api_client_base import ApiClientBase
 from data_pipelines.sport_monks.entities import Leagues, Player
@@ -23,6 +22,7 @@ class SportMonksCollections(Enum):
 ENTITY_SWITCHER = {
     SportMonksCollections.PLAYERS: Player,
     SportMonksCollections.LEAGUES: Leagues,
+    SportMonksCollections.TEAMS: Leagues,
 }
 
 
@@ -36,7 +36,9 @@ class SportMonksClient(ApiClientBase):
         self.api_key = os.getenv("SPORT_MONKS_API_KEY", default="")
         self.api_url = os.getenv("SPORT_MONKS_BASE_URL", default="")
 
-    def get_data_in_batches(self, collection: SportMonksCollections, entity: Any) -> Iterator[Any]:
+    def get_data_in_batches(
+        self, collection: SportMonksCollections, entity: IEntity
+    ) -> Iterator[Any]:
         has_more_pages = True
         page = 1
         per_page = 50
@@ -49,5 +51,4 @@ class SportMonksClient(ApiClientBase):
             has_more_pages = response["pagination"]["has_more"]
             page += 1
 
-            converter = deepcopy(cattrs.global_converter)
-            yield [converter.structure(data, entity) for data in response["data"]]
+            yield [entity.from_dict(data) for data in response["data"]]

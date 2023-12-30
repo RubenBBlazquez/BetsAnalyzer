@@ -4,11 +4,11 @@ from typing import Optional
 
 import attr
 
-from data_pipelines.common.entity import IEntity
+from data_pipelines.common.entity import EntityBase
 
 
 @attr.s(auto_attribs=True)
-class Player(IEntity):
+class Player(EntityBase):
     """
     Entity that represents a player in sportmonks API
     """
@@ -32,12 +32,9 @@ class Player(IEntity):
     date_of_birth: str
     gender: str
 
-    def to_dict(self) -> dict:
-        return attr.asdict(self)
-
 
 @attr.s(auto_attribs=True)
-class Leagues(IEntity):
+class Leagues(EntityBase):
     """
     Entity that represents a league in sportmonks API
     """
@@ -54,6 +51,3 @@ class Leagues(IEntity):
     last_played_at: str
     category: Optional[int]
     has_jerseys: bool
-
-    def to_dict(self) -> dict:
-        return attr.asdict(self)
