@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime
 
 import attr
 from airflow import Dataset
@@ -36,10 +36,11 @@ class SportMonksDownloadDagBuilder(IDagBuilder):
             self._writer.write(data, f"raw_data_{self._collection.value}")
 
     def build(self):
+        today = datetime.today()
         dag = DAG(
             dag_id=f"Downloader_SportMonks_{self._collection.value.capitalize()}",
             schedule="@daily",
-            start_date=datetime.now() - timedelta(days=2),
+            start_date=datetime(today.year, today.month, today.day),
         )
 
         with dag:

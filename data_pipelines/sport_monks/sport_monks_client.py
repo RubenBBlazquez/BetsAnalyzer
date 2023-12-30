@@ -6,7 +6,9 @@ import attr
 from common.entity import IEntity
 
 from data_pipelines.common.api_client_base import ApiClientBase
-from data_pipelines.sport_monks.entities import Leagues, Player, Teams
+from data_pipelines.sport_monks.entities.league import Leagues
+from data_pipelines.sport_monks.entities.player import Player
+from data_pipelines.sport_monks.entities.team import Teams
 
 
 class SportMonksCollections(Enum):
