@@ -1,4 +1,4 @@
-from sport_monks.downloaders.entities import Teams
+from sport_monks.downloaders.entities.team import Team
 
 team_players = [
     {
@@ -45,13 +45,13 @@ teams_data = {
 
 
 def test_teams_to_dict():
-    teams = Teams(**teams_data)
+    teams = Team(**teams_data)
     teams_dict = teams.to_dict()
     assert teams_dict == teams_data
 
 
 def test_teams_from_dict():
-    teams = Teams.from_dict(teams_data)
-    assert isinstance(teams, Teams)
+    teams = Team.from_dict(teams_data)
+    assert isinstance(teams, Team)
     assert teams.name == "City Eagles"
     assert len(teams.players) == 2

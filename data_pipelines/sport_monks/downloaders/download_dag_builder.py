@@ -1,6 +1,7 @@
 from datetime import datetime
 
 import attr
+import pandas as pd
 from airflow import Dataset
 from airflow.models.dag import DAG
 from airflow.operators.python import PythonOperator
@@ -33,6 +34,7 @@ class SportMonksDownloadDagBuilder(IDagBuilder):
         iterator = sport_monks_client.get_data_in_batches(self._collection, entity)
 
         for data in iterator:
+            data = pd.DataFrame([entity.to_dict() for entity in data])
             self._writer.write(data, f"raw_data_{self._collection.name.lower()}")
 
     def build(self):

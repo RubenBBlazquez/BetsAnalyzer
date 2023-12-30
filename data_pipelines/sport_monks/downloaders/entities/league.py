@@ -6,7 +6,7 @@ from data_pipelines.sport_monks.downloaders.entities.entity_base import Download
 
 
 @attr.s(auto_attribs=True)
-class Leagues(DownloaderEntityBase):
+class League(DownloaderEntityBase):
     """
     Entity that represents a league in sportmonks API
     """

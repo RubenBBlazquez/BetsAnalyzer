@@ -1,11 +1,11 @@
 import logging
 import os
-from typing import Iterable
 
 import attr
+import pandas as pd
 from pymongo import MongoClient
 
-from data_pipelines.common.writers.writer import IEntity, IWriter
+from data_pipelines.common.writers.writer import IWriter
 
 
 class MongoDBConnection:
@@ -41,14 +41,14 @@ class MongoDBWriter(IWriter):
     _database_name: str
     _db_connection: MongoClient = MongoDBConnection().db_conn
 
-    def write(self, entities: Iterable[IEntity], collection: str):
+    def write(self, entities: pd.DataFrame, collection: str):
         logging.info(
             f"Writing data in {collection} "
             f"from {self._database_name} "
-            f"to Mongodb: {len(list(entities))}"
+            f"to Mongodb: {entities.shape[0]}"
         )
         (
             self._db_connection.get_database(self._database_name)
             .get_collection(collection)
-            .insert_many(entity.to_dict() for entity in entities)
+            .insert_many(entities.to_dict("records"))
         )

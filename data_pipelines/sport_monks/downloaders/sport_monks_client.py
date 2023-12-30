@@ -5,10 +5,10 @@ from typing import Any, Iterator
 import attr
 from sport_monks.downloaders.entities.country import Country
 from sport_monks.downloaders.entities.entity_base import DownloaderEntityBase
-from sport_monks.downloaders.entities.league import Leagues
+from sport_monks.downloaders.entities.league import League
 from sport_monks.downloaders.entities.match import Match
 from sport_monks.downloaders.entities.player import Player
-from sport_monks.downloaders.entities.team import Teams
+from sport_monks.downloaders.entities.team import Team
 from sport_monks.downloaders.entities.type import Type
 
 from data_pipelines.common.api_client_base import ApiClientBase
@@ -29,8 +29,8 @@ class SportMonksCollections(Enum):
 
 DOWNLOADER_ENTITY_SWITCHER = {
     SportMonksCollections.PLAYERS: Player,
-    SportMonksCollections.LEAGUES: Leagues,
-    SportMonksCollections.TEAMS: Teams,
+    SportMonksCollections.LEAGUES: League,
+    SportMonksCollections.TEAMS: Team,
     SportMonksCollections.MATCHES: Match,
     SportMonksCollections.COUNTRIES: Country,
     SportMonksCollections.TYPES: Type,

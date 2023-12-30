@@ -24,7 +24,7 @@ class TeamPlayer(DownloaderEntityBase):
 
 
 @attr.s(auto_attribs=True)
-class Teams(DownloaderEntityBase):
+class Team(DownloaderEntityBase):
     """
     Entity that represents a Team in sportmonks API
     """

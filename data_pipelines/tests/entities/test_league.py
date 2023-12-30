@@ -1,4 +1,4 @@
-from sport_monks.downloaders.entities import Leagues
+from sport_monks.downloaders.entities.league import League
 
 league_data = {
     "id": 2,
@@ -17,12 +17,12 @@ league_data = {
 
 
 def test_league_to_dict():
-    league = Leagues(**league_data)
+    league = League(**league_data)
     league_dict = league.to_dict()
     assert league_dict == league_data
 
 
 def test_league_from_dict():
-    league = Leagues.from_dict(league_data)
-    assert isinstance(league, Leagues)
+    league = League.from_dict(league_data)
+    assert isinstance(league, League)
     assert league.name == "Premier League"
