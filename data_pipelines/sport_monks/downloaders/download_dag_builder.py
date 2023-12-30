@@ -4,15 +4,15 @@ import attr
 from airflow import Dataset
 from airflow.models.dag import DAG
 from airflow.operators.python import PythonOperator
-
-from data_pipelines.common.dag_builder import DagCollector, IDagBuilder
-from data_pipelines.common.writers.mongodb_writer import MongoDBWriter
-from data_pipelines.common.writers.writer import IWriter
-from data_pipelines.sport_monks.sport_monks_client import (
+from sport_monks.downloaders.sport_monks_client import (
     ENTITY_SWITCHER,
     SportMonksClient,
     SportMonksCollections,
 )
+
+from data_pipelines.common.dag_builder import DagCollector, IDagBuilder
+from data_pipelines.common.writers.mongodb_writer import MongoDBWriter
+from data_pipelines.common.writers.writer import IWriter
 
 
 @attr.s(auto_attribs=True)

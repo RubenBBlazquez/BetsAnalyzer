@@ -1,16 +1,17 @@
 import os
 from enum import Enum
-from typing import Any, Iterator, Type
+from typing import Any, Iterator
 
 import attr
-from common.entity import IEntity
-from sport_monks.entities.country import Country
-from sport_monks.entities.match import Match
+from sport_monks.downloaders.entities.country import Country
+from sport_monks.downloaders.entities.entity_base import IEntity
+from sport_monks.downloaders.entities.league import Leagues
+from sport_monks.downloaders.entities.match import Match
+from sport_monks.downloaders.entities.player import Player
+from sport_monks.downloaders.entities.team import Teams
+from sport_monks.downloaders.entities.type import Type
 
 from data_pipelines.common.api_client_base import ApiClientBase
-from data_pipelines.sport_monks.entities.league import Leagues
-from data_pipelines.sport_monks.entities.player import Player
-from data_pipelines.sport_monks.entities.team import Teams
 
 
 class SportMonksCollections(Enum):
@@ -55,14 +56,15 @@ class SportMonksClient(ApiClientBase):
 
         while has_more_pages:
             response = self.get(
-                url=f"{self.api_url}/football/{collection.value}",
+                url=f"{self.api_url}/{entity.get_middle_endpoint()}/{collection.value}",
                 params={
                     "api_token": self.api_key,
                     "page": page,
                     "per_page": per_page,
-                    "include": ";".join(entity.includes()),
+                    "include": ";".join(entity.get_includes()),
                 },
             )
+
             has_more_pages = response["pagination"]["has_more"]
             page += 1
 

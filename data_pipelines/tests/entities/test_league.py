@@ -1,4 +1,4 @@
-from sport_monks.entities.league import Leagues
+from sport_monks.downloaders.entities import Leagues
 
 league_data = {
     "id": 2,

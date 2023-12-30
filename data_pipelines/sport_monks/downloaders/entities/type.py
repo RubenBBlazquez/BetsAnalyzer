@@ -1,7 +1,7 @@
 from typing import Optional
 
 import attr
-from common.entity import EntityBase
+from sport_monks.downloaders.entities.entity_base import EntityBase
 
 
 @attr.s(auto_attribs=True)
@@ -16,3 +16,7 @@ class Type(EntityBase):
     developer_name: str
     model_type: str
     stat_group: Optional[str]
+
+    @staticmethod
+    def get_middle_endpoint() -> str:
+        return "core"

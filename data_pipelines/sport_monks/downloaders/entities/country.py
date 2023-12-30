@@ -1,5 +1,7 @@
+from typing import Optional
+
 import attr
-from common.entity import EntityBase
+from sport_monks.downloaders.entities.entity_base import EntityBase
 
 
 @attr.s(auto_attribs=True)
@@ -17,5 +19,9 @@ class Country(EntityBase):
     iso3: str
     latitude: str
     longitude: str
-    borders: list[str]
+    borders: Optional[list[str]]
     image_path: str
+
+    @staticmethod
+    def get_middle_endpoint() -> str:
+        return "core"

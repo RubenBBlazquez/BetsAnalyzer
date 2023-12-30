@@ -15,13 +15,25 @@ class IEntity(ABC):
 
     @staticmethod
     @abstractmethod
-    def includes() -> list[str]:
+    def get_includes() -> list[str]:
         """
         method to obtain includes in sportMonks for each entity
 
         Returns
         -------
         list of includes
+        """
+        raise NotImplementedError()
+
+    @staticmethod
+    @abstractmethod
+    def get_middle_endpoint() -> str:
+        """
+        middle endpoint to obtain data in sportMonks for each entity
+
+        Returns
+        -------
+        middle endpoint
         """
         raise NotImplementedError()
 
@@ -56,7 +68,7 @@ class EntityBase(ABC):
     """
 
     @staticmethod
-    def includes() -> list[str]:
+    def get_includes() -> list[str]:
         """
         method to obtain includes in sportMonks for each entity
 
@@ -87,3 +99,14 @@ class EntityBase(ABC):
         """
         converter = deepcopy(cattrs.global_converter)
         return converter.structure(dict_, cls)
+
+    @staticmethod
+    def get_middle_endpoint() -> str:
+        """
+        middle endpoint to obtain data in sportMonks for each entity
+
+        Returns
+        -------
+        middle endpoint
+        """
+        return "football"

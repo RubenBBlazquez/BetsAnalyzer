@@ -1,8 +1,7 @@
 from typing import Optional
 
 import attr
-
-from data_pipelines.common.entity import EntityBase
+from sport_monks.downloaders.entities.entity_base import EntityBase
 
 
 @attr.s(auto_attribs=True)
