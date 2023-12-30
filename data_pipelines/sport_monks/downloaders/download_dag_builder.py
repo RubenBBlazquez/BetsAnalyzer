@@ -5,7 +5,7 @@ from airflow import Dataset
 from airflow.models.dag import DAG
 from airflow.operators.python import PythonOperator
 from sport_monks.downloaders.sport_monks_client import (
-    ENTITY_SWITCHER,
+    DOWNLOADER_ENTITY_SWITCHER,
     SportMonksClient,
     SportMonksCollections,
 )
@@ -29,7 +29,7 @@ class SportMonksDownloadDagBuilder(IDagBuilder):
         Method to download and save data
         """
         sport_monks_client = SportMonksClient()
-        entity = ENTITY_SWITCHER[self._collection]
+        entity = DOWNLOADER_ENTITY_SWITCHER[self._collection]
         iterator = sport_monks_client.get_data_in_batches(self._collection, entity)
 
         for data in iterator:

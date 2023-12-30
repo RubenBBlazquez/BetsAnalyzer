@@ -1,6 +1,6 @@
 from abc import ABC
 
-from sport_monks.downloaders.entities.entity_base import IEntity
+from common.entity_base import IEntity
 
 
 class IWriter(ABC):

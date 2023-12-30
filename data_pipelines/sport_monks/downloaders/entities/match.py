@@ -1,7 +1,8 @@
 from typing import Optional
 
 import attr
-from sport_monks.downloaders.entities.entity_base import EntityBase
+
+from data_pipelines.sport_monks.downloaders.entities.entity_base import DownloaderEntityBase
 
 
 @attr.s(auto_attribs=True)
@@ -126,7 +127,7 @@ class MatchFormations:
 
 
 @attr.s(auto_attribs=True)
-class Match(EntityBase):
+class Match(DownloaderEntityBase):
     """
     Entity that represents a Match in sportmonks API
     """

@@ -4,7 +4,7 @@ from typing import Any, Iterator
 
 import attr
 from sport_monks.downloaders.entities.country import Country
-from sport_monks.downloaders.entities.entity_base import IEntity
+from sport_monks.downloaders.entities.entity_base import DownloaderEntityBase
 from sport_monks.downloaders.entities.league import Leagues
 from sport_monks.downloaders.entities.match import Match
 from sport_monks.downloaders.entities.player import Player
@@ -27,7 +27,7 @@ class SportMonksCollections(Enum):
     TYPES = "types"
 
 
-ENTITY_SWITCHER = {
+DOWNLOADER_ENTITY_SWITCHER = {
     SportMonksCollections.PLAYERS: Player,
     SportMonksCollections.LEAGUES: Leagues,
     SportMonksCollections.TEAMS: Teams,
@@ -48,7 +48,7 @@ class SportMonksClient(ApiClientBase):
         self.api_url = os.getenv("SPORT_MONKS_BASE_URL", default="")
 
     def get_data_in_batches(
-        self, collection: SportMonksCollections, entity: IEntity
+        self, collection: SportMonksCollections, entity: DownloaderEntityBase
     ) -> Iterator[Any]:
         has_more_pages = True
         page = 1

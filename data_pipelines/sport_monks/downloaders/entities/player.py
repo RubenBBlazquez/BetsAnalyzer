@@ -1,11 +1,12 @@
 from typing import Optional
 
 import attr
-from sport_monks.downloaders.entities.entity_base import EntityBase
+
+from data_pipelines.sport_monks.downloaders.entities.entity_base import DownloaderEntityBase
 
 
 @attr.s(auto_attribs=True)
-class Player(EntityBase):
+class Player(DownloaderEntityBase):
     """
     Entity that represents a player in sportmonks API
     """
