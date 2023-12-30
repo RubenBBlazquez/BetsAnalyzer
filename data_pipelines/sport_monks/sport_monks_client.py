@@ -4,6 +4,7 @@ from typing import Any, Iterator
 
 import attr
 from common.entity import IEntity
+from sport_monks.entities.match import Match
 
 from data_pipelines.common.api_client_base import ApiClientBase
 from data_pipelines.sport_monks.entities.league import Leagues
@@ -19,12 +20,14 @@ class SportMonksCollections(Enum):
     PLAYERS = "players"
     TEAMS = "teams"
     LEAGUES = "leagues"
+    MATCHES = "fixtures"
 
 
 ENTITY_SWITCHER = {
     SportMonksCollections.PLAYERS: Player,
     SportMonksCollections.LEAGUES: Leagues,
     SportMonksCollections.TEAMS: Teams,
+    SportMonksCollections.MATCHES: Match,
 }
 
 

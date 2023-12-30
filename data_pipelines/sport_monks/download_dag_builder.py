@@ -33,12 +33,12 @@ class SportMonksDownloadDagBuilder(IDagBuilder):
         iterator = sport_monks_client.get_data_in_batches(self._collection, entity)
 
         for data in iterator:
-            self._writer.write(data, f"raw_data_{self._collection.value}")
+            self._writer.write(data, f"raw_data_{self._collection.name.lower()}")
 
     def build(self):
         today = datetime.today()
         dag = DAG(
-            dag_id=f"Downloader_SportMonks_{self._collection.value.capitalize()}",
+            dag_id=f"Downloader_SportMonks_{self._collection.name.capitalize()}",
             schedule="@daily",
             start_date=datetime(today.year, today.month, today.day),
         )
@@ -47,7 +47,7 @@ class SportMonksDownloadDagBuilder(IDagBuilder):
             PythonOperator(
                 python_callable=self._download_and_save_data,
                 task_id="download_and_save_data",
-                outlets=[Dataset(f"SportMonks_Get_{self._collection.value}")],
+                outlets=[Dataset(f"SportMonks_Get_{self._collection.name.lower()}")],
             )
 
         return dag
@@ -60,7 +60,7 @@ def build_sport_monks_dags() -> list[DAG]:
     dag_collector = DagCollector()
     writer = MongoDBWriter("sport_monks")
 
-    for type_ in SportMonksCollections:
-        dag_collector.add_builder(SportMonksDownloadDagBuilder(type_, writer))
+    for collection in SportMonksCollections:
+        dag_collector.add_builder(SportMonksDownloadDagBuilder(collection, writer))
 
     return dag_collector.collect()
