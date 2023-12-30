@@ -1,9 +1,10 @@
 import os
 from enum import Enum
-from typing import Any, Iterator
+from typing import Any, Iterator, Type
 
 import attr
 from common.entity import IEntity
+from sport_monks.entities.country import Country
 from sport_monks.entities.match import Match
 
 from data_pipelines.common.api_client_base import ApiClientBase
@@ -21,6 +22,8 @@ class SportMonksCollections(Enum):
     TEAMS = "teams"
     LEAGUES = "leagues"
     MATCHES = "fixtures"
+    COUNTRIES = "countries"
+    TYPES = "types"
 
 
 ENTITY_SWITCHER = {
@@ -28,6 +31,8 @@ ENTITY_SWITCHER = {
     SportMonksCollections.LEAGUES: Leagues,
     SportMonksCollections.TEAMS: Teams,
     SportMonksCollections.MATCHES: Match,
+    SportMonksCollections.COUNTRIES: Country,
+    SportMonksCollections.TYPES: Type,
 }
 
 
