@@ -13,6 +13,18 @@ class IEntity(ABC):
     to represent data and insert it into the database if its necessary
     """
 
+    @staticmethod
+    @abstractmethod
+    def includes() -> list[str]:
+        """
+        method to obtain includes in sportMonks for each entity
+
+        Returns
+        -------
+        list of includes
+        """
+        raise NotImplementedError()
+
     @abstractmethod
     def to_dict(self) -> dict:
         """
@@ -42,6 +54,17 @@ class EntityBase(ABC):
     """
     Base Entity class
     """
+
+    @staticmethod
+    def includes() -> list[str]:
+        """
+        method to obtain includes in sportMonks for each entity
+
+        Returns
+        -------
+        list of includes
+        """
+        return []
 
     def to_dict(self) -> dict:
         """

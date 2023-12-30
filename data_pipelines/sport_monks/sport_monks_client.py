@@ -46,7 +46,12 @@ class SportMonksClient(ApiClientBase):
         while has_more_pages:
             response = self.get(
                 url=f"{self.api_url}/football/{collection.value}",
-                params={"api_token": self.api_key, "page": page, "per_page": per_page},
+                params={
+                    "api_token": self.api_key,
+                    "page": page,
+                    "per_page": per_page,
+                    "include": ";".join(entity.includes()),
+                },
             )
             has_more_pages = response["pagination"]["has_more"]
             page += 1
