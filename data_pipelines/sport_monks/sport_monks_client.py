@@ -6,7 +6,7 @@ import attr
 from common.entity import IEntity
 
 from data_pipelines.common.api_client_base import ApiClientBase
-from data_pipelines.sport_monks.entities import Leagues, Player
+from data_pipelines.sport_monks.entities import Leagues, Player, Teams
 
 
 class SportMonksCollections(Enum):
@@ -22,7 +22,7 @@ class SportMonksCollections(Enum):
 ENTITY_SWITCHER = {
     SportMonksCollections.PLAYERS: Player,
     SportMonksCollections.LEAGUES: Leagues,
-    SportMonksCollections.TEAMS: Leagues,
+    SportMonksCollections.TEAMS: Teams,
 }
 
 

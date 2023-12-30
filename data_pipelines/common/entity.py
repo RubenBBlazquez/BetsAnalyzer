@@ -37,7 +37,7 @@ class IEntity(ABC):
         raise NotImplementedError()
 
 
-@classmethod
+@attr.s(auto_attribs=True)
 class EntityBase(ABC):
     """
     Base Entity class

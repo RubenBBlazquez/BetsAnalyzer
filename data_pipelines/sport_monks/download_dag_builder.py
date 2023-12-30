@@ -33,11 +33,11 @@ class SportMonksDownloadDagBuilder(IDagBuilder):
         iterator = sport_monks_client.get_data_in_batches(self._collection, entity)
 
         for data in iterator:
-            self._writer.write(data, self._collection.value)
+            self._writer.write(data, f"raw_data_{self._collection.value}")
 
     def build(self):
         dag = DAG(
-            dag_id=f"Downloader_SportMonks_Get_{self._collection.value}",
+            dag_id=f"Downloader_SportMonks_{self._collection.value.capitalize()}",
             schedule="@daily",
             start_date=datetime.now() - timedelta(days=2),
         )

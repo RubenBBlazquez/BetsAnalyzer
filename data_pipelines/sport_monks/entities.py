@@ -51,3 +51,23 @@ class Leagues(EntityBase):
     last_played_at: str
     category: Optional[int]
     has_jerseys: bool
+
+
+@attr.s(auto_attribs=True)
+class Teams(EntityBase):
+    """
+    Entity that represents a Team in sportmonks API
+    """
+
+    id: int
+    sport_id: int
+    country_id: Optional[int]
+    venue_id: Optional[int]
+    gender: bool
+    name: str
+    short_code: str
+    image_path: str
+    founded: Optional[int]
+    type: str
+    placeholder: bool
+    last_played_at: str
