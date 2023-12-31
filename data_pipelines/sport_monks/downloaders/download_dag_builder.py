@@ -57,7 +57,7 @@ class SportMonksDownloadDagBuilder(IDagBuilder):
             PythonOperator(
                 python_callable=self._download_and_save_data,
                 task_id="download_and_save_data",
-                outlets=[Dataset(f"SportMonks_Get_{self._entity.get_endpoint().capitalize()}")],
+                outlets=[Dataset(f"raw_data_{self._entity.get_endpoint().lower()}")],
             )
 
         return dag

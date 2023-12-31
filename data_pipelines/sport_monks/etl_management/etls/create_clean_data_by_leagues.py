@@ -11,6 +11,7 @@ INPUT_COLLECTIONS = [
     ExtractorConfig(f"raw_data_{SportMonksEndpoints.LEAGUES.value}"),
     ExtractorConfig(f"raw_data_{SportMonksEndpoints.MATCHES.value}"),
     ExtractorConfig(f"raw_data_{SportMonksEndpoints.PLAYERS.value}"),
+    ExtractorConfig(f"raw_data_{SportMonksEndpoints.TEAMS.value}"),
     ExtractorConfig(f"raw_data_{SportMonksEndpoints.COUNTRIES.value}"),
     ExtractorConfig(f"raw_data_{SportMonksEndpoints.TYPES.value}"),
 ]
