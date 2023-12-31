@@ -1,3 +1,4 @@
+import os
 from datetime import datetime
 
 import attr
@@ -7,7 +8,6 @@ from airflow.models.dag import DAG
 from airflow.operators.python import PythonOperator
 from sport_monks.downloaders.entities.entity_base import DownloaderEntityBase
 from sport_monks.downloaders.sport_monks_client import (
-    DATABASE_NAME,
     DOWNLOADER_ENTITY_SWITCHER,
     RAW_DATA_COLLECTIONS_SWITCHER,
     SportMonksClient,
@@ -72,7 +72,7 @@ def build_sport_monks_dags() -> list[DAG]:
     for endpoint in SportMonksEndpoints:
         entity = DOWNLOADER_ENTITY_SWITCHER[endpoint]
         raw_data_collection = RAW_DATA_COLLECTIONS_SWITCHER[endpoint]
-        writer = MongoDBWriter(DATABASE_NAME, raw_data_collection)
+        writer = MongoDBWriter(os.getenv("PROJECT_DATABASE", "sport_monks"), raw_data_collection)
 
         dag_collector.add_builder(SportMonksDownloadDagBuilder(entity, writer))
 

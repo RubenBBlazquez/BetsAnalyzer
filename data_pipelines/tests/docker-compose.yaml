@@ -1,0 +1,25 @@
+version: "3"
+
+services:
+  mongo:
+    image: mongo:6.0.11-jammy
+    environment:
+        MONGO_INITDB_ROOT_USERNAME: "${MONGO_USER:-root}"
+        MONGO_INITDB_ROOT_PASSWORD: "${MONGO_PASSWORD:-root}"
+    ports:
+      - "27019:27017"
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+    networks:
+      network:
+        ipv4_address: 10.5.0.5
+
+networks:
+  network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.5.0.0/16
+          gateway: 10.5.0.1

@@ -1,3 +1,4 @@
+import logging
 import os
 
 from pymongo import MongoClient
@@ -11,6 +12,7 @@ class MongoDBConnection:
         port = os.getenv("MONGO_PORT")
         auth_db = os.getenv("MONGO_AUTH_DATABASE")
         connection_uri = f"mongodb://{user}:{password}@{host}:{port}?authSource={auth_db}"
+        logging.info(f"connection_uri: {connection_uri}")
         self.db_conn = MongoClient(connection_uri)
 
     # singleton

@@ -19,7 +19,10 @@ class MongoDBExtractor(BaseExtractor):
     """
 
     _database_name: str
-    _db_connection: MongoClient = MongoDBConnection().db_conn
+    _db_connection: MongoClient = attr.s(init=False)
+
+    def __attrs_post_init__(self):
+        self._db_connection = MongoDBConnection().db_conn
 
     def extract(self) -> dict[str, pd.DataFrame]:
         extracted_information = {}

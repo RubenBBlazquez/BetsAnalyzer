@@ -27,8 +27,6 @@ class SportMonksEndpoints(Enum):
     TYPES = "types"
 
 
-DATABASE_NAME = "sport_monks"
-
 RAW_DATA_COLLECTIONS_SWITCHER = {
     SportMonksEndpoints.PLAYERS: "raw_data_players",
     SportMonksEndpoints.LEAGUES: "raw_data_leagues",

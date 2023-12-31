@@ -3,7 +3,7 @@ from datetime import datetime
 import attr
 from airflow.models.dag import DAG
 from airflow.operators.python import PythonOperator
-from sport_monks.etl_management.etls.create_clean_data_by_leagues import etl_create_data_by_leagues
+from sport_monks.etl_management.etls.create_clean_data_by_leagues import etl_clean_data_by_leagues
 from sport_monks.etl_management.etls.etl_base import ETL
 
 from data_pipelines.common.dag_builder import DagCollector, IDagBuilder
@@ -49,7 +49,7 @@ def build_sport_monks_dags() -> list[DAG]:
     dag_collector = DagCollector()
 
     etls = [
-        etl_create_data_by_leagues(),
+        etl_clean_data_by_leagues(),
     ]
 
     for etl in etls:
