@@ -27,5 +27,5 @@ def pytest_sessionstart(session):
 
 
 def pytest_sessionfinish(session, exitstatus):
+    MongoDBConnection().db_conn.drop_database("sport_monks_prueba")
     subprocess.run(["docker-compose", "-f", DOCKER_COMPOSE_FILE, "down", "-v"], check=True)
-    mongo_db_conn().drop_database("sport_monks_prueba")
