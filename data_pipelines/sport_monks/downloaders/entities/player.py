@@ -5,6 +5,7 @@ import attr
 from data_pipelines.sport_monks.downloaders.entities.entity_base import DownloaderEntityBase
 
 
+@attr.s(auto_attribs=True)
 class PlayerPosition:
     """
     Entity that represents a position in sportmonks API Players endpoint
@@ -18,6 +19,7 @@ class PlayerPosition:
     stat_group: Optional[str]
 
 
+@attr.s(auto_attribs=True)
 class PlayerTransfer:
     """
     Entity that represents a transfer in sportmonks API Players endpoint
@@ -37,6 +39,7 @@ class PlayerTransfer:
     amount: Optional[int]
 
 
+@attr.s(auto_attribs=True)
 class PlayerTeam:
     """
     Entity that represents a team in sportmonks API Players endpoint
@@ -83,7 +86,7 @@ class Player(DownloaderEntityBase):
     position: Optional[PlayerPosition]
 
     @staticmethod
-    def includes() -> list[str]:
+    def get_includes() -> list[str]:
         """
         method to obtain includes in sportMonks for each entity
 
@@ -98,7 +101,6 @@ class Player(DownloaderEntityBase):
         return "players"
 
 
-@attr.s(auto_attribs=True)
 class SpainPlayers(Player):
     """
     Entity that represents a spain players in sportmonks API
@@ -108,8 +110,11 @@ class SpainPlayers(Player):
     def get_endpoint() -> str:
         return "players/countries/32"
 
+    @staticmethod
+    def get_includes() -> list[str]:
+        return ["position", "teams", "transfers"]
 
-@attr.s(auto_attribs=True)
+
 class EnglandPlayers(Player):
     """
     Entity that represents a spain players in sportmonks API
@@ -119,8 +124,11 @@ class EnglandPlayers(Player):
     def get_endpoint() -> str:
         return "players/countries/462"
 
+    @staticmethod
+    def get_includes() -> list[str]:
+        return ["position", "teams", "transfers"]
 
-@attr.s(auto_attribs=True)
+
 class GermanyPlayers(Player):
     """
     Entity that represents a spain players in sportmonks API
@@ -129,3 +137,7 @@ class GermanyPlayers(Player):
     @staticmethod
     def get_endpoint() -> str:
         return "players/countries/11"
+
+    @staticmethod
+    def get_includes() -> list[str]:
+        return ["position", "teams", "transfers"]
