@@ -17,13 +17,11 @@ x-airflow-common:
     PYTHONPATH: "${PYTHONPATH:-}:/opt/airflow"
   env_file:
     - ${AIRFLOW_PROJ_DIR:-.}/config/.env
-
   volumes:
     - ${AIRFLOW_PROJ_DIR:-.}/airflow_config/dags:/opt/airflow/dags
     - ${AIRFLOW_PROJ_DIR:-.}/data_pipelines:/opt/airflow/data_pipelines
     - ${AIRFLOW_PROJ_DIR:-.}/airflow_config/logs:/opt/airflow/logs
     - ${AIRFLOW_PROJ_DIR:-.}/airflow_config/config:/opt/airflow/config
-    - ${AIRFLOW_PROJ_DIR:-.}/config/.env:/opt/airflow/config/.env
     - ${AIRFLOW_PROJ_DIR:-.}/airflow_config/plugins:/opt/airflow/plugins
     - ${AIRFLOW_PROJ_DIR:-.}/airflow_dags_entry_point.sh:/opt/airflow/airflow_dags_entry_point.sh
   entrypoint: [ "/opt/airflow/airflow_dags_entry_point.sh" ]
@@ -46,30 +44,36 @@ services:
     volumes:
       - postgres-db-volume:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD", "pg_isready", "-U", "airflow"]
+      test: [ "CMD", "pg_isready", "-U", "airflow" ]
       interval: 10s
       retries: 5
       start_period: 5s
     restart: always
+    networks:
+      network:
+        ipv4_address: 172.18.10.1
 
   mongodb:
     container_name: "mongodb_ba"
     image: mongo:4.4.8
     volumes:
-        -  ${AIRFLOW_PROJ_DIR:-.}/mongo_volumes/data:/data/db
-        -  ${AIRFLOW_PROJ_DIR:-.}/config/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
-        -  ${AIRFLOW_PROJ_DIR:-.}/mongo_volumes/configdb:/data/configdb
+      - ${AIRFLOW_PROJ_DIR:-.}/mongo_volumes/data:/data/db
+      - ${AIRFLOW_PROJ_DIR:-.}/config/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+      - ${AIRFLOW_PROJ_DIR:-.}/mongo_volumes/configdb:/data/configdb
     ports:
       - "27017:27017"
     env_file:
       - ${AIRFLOW_PROJ_DIR:-.}/config/.env
     healthcheck:
-        test: ["CMD", "mongo", "--eval", "db.adminCommand('ping')"]
-        interval: 10s
-        timeout: 30s
-        retries: 50
-        start_period: 30s
+      test: [ "CMD", "mongo", "--eval", "db.adminCommand('ping')" ]
+      interval: 10s
+      timeout: 30s
+      retries: 50
+      start_period: 30s
     restart: always
+    networks:
+      network:
+        ipv4_address:  172.18.10.2
 
 
   redis:
@@ -77,12 +81,15 @@ services:
     expose:
       - 6379
     healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
+      test: [ "CMD", "redis-cli", "ping" ]
       interval: 10s
       timeout: 30s
       retries: 50
       start_period: 30s
     restart: always
+    networks:
+      network:
+        ipv4_address: 172.18.10.3
 
   airflow-webserver:
     <<: *airflow-common
@@ -90,7 +97,7 @@ services:
     ports:
       - "8080:8080"
     healthcheck:
-      test: ["CMD", "curl", "--fail", "http://localhost:8080/health"]
+      test: [ "CMD", "curl", "--fail", "http://localhost:8080/health" ]
       interval: 30s
       timeout: 10s
       retries: 5
@@ -100,12 +107,15 @@ services:
       <<: *airflow-common-depends-on
       airflow-init:
         condition: service_completed_successfully
+    networks:
+      network:
+        ipv4_address:  172.18.10.4
 
   airflow-scheduler:
     <<: *airflow-common
     command: scheduler
     healthcheck:
-      test: ["CMD", "curl", "--fail", "http://localhost:8974/health"]
+      test: [ "CMD", "curl", "--fail", "http://localhost:8974/health" ]
       interval: 30s
       timeout: 10s
       retries: 5
@@ -115,6 +125,9 @@ services:
       <<: *airflow-common-depends-on
       airflow-init:
         condition: service_completed_successfully
+    networks:
+      network:
+        ipv4_address:  172.18.10.5
 
   airflow-worker:
     <<: *airflow-common
@@ -135,12 +148,17 @@ services:
       <<: *airflow-common-depends-on
       airflow-init:
         condition: service_completed_successfully
+    ports:
+      - "5555:5555" # we open port to debug with web pdb
+    networks:
+      network:
+        ipv4_address:  172.18.10.6
 
   airflow-triggerer:
     <<: *airflow-common
     command: triggerer
     healthcheck:
-      test: ["CMD-SHELL", 'airflow jobs check --job-type TriggererJob --hostname "$${HOSTNAME}"']
+      test: [ "CMD-SHELL", 'airflow jobs check --job-type TriggererJob --hostname "$${HOSTNAME}"' ]
       interval: 30s
       timeout: 10s
       retries: 5
@@ -150,6 +168,9 @@ services:
       <<: *airflow-common-depends-on
       airflow-init:
         condition: service_completed_successfully
+    networks:
+      network:
+        ipv4_address:  172.18.10.7
 
   airflow-init:
     <<: *airflow-common
@@ -213,6 +234,9 @@ services:
     user: "0:0"
     volumes:
       - ${AIRFLOW_PROJ_DIR:-.}/airflow_config/sources:/sources
+    networks:
+      network:
+        ipv4_address:  172.18.10.8
 
   airflow-cli:
     <<: *airflow-common
@@ -226,25 +250,18 @@ services:
       - bash
       - -c
       - airflow
-
-  flower:
-    <<: *airflow-common
-    command: celery flower
-    profiles:
-      - flower
-    ports:
-      - "5555:5555"
-    healthcheck:
-      test: ["CMD", "curl", "--fail", "http://localhost:5555/"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
-      start_period: 30s
-    restart: always
-    depends_on:
-      <<: *airflow-common-depends-on
-      airflow-init:
-        condition: service_completed_successfully
+    networks:
+      network:
+        ipv4_address:  172.18.10.9
 
 volumes:
   postgres-db-volume:
+
+networks:
+  network:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.18.10.0/16
+          gateway: 172.18.10.0

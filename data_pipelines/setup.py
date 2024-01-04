@@ -1,7 +1,7 @@
 import setuptools
 
 # Read the contents of your requirements file
-with open("requirements.txt") as f:
+with open("./requirements.txt") as f:
     required_packages = f.read().splitlines()
 
 setuptools.setup(

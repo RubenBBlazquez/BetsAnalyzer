@@ -6,13 +6,12 @@ import pandas as pd
 from airflow import Dataset
 from airflow.models.dag import DAG
 from airflow.operators.python import PythonOperator
-from sport_monks.downloaders.entities.entity_base import DownloaderEntityBase
-from sport_monks.downloaders.sport_monks_client import (
+from sport_monks.downloaders.constants import (
     DOWNLOADER_ENTITY_SWITCHER,
     RAW_DATA_COLLECTIONS_SWITCHER,
-    SportMonksClient,
-    SportMonksEndpoints,
 )
+from sport_monks.downloaders.entities.entity_base import DownloaderEntityBase
+from sport_monks.downloaders.sport_monks_client import SportMonksClient, SportMonksEndpoints
 
 from data_pipelines.common.dag_builder import DagCollector, IDagBuilder
 from data_pipelines.common.writers.base import IWriter
@@ -43,21 +42,28 @@ class SportMonksDownloadDagBuilder(IDagBuilder):
         iterator = sport_monks_client.get_data_in_batches(self._entity)
 
         for data in iterator:
+            if not len(data):
+                continue
+
             self._writer.write(pd.DataFrame([entity.to_dict() for entity in data]))
 
     def build(self):
         today = datetime.today()
+        dag_name = self._entity.get_endpoint().capitalize().replace("/", "_")
         dag = DAG(
-            dag_id=f"Downloader_SportMonks_{self._entity.get_endpoint().capitalize()}",
+            dag_id=f"Downloader_SportMonks_{dag_name}",
             schedule="@daily",
             start_date=datetime(today.year, today.month, today.day),
         )
+
+        endpoint = SportMonksEndpoints(self._entity.get_endpoint())
+        dataset = RAW_DATA_COLLECTIONS_SWITCHER[endpoint]
 
         with dag:
             PythonOperator(
                 python_callable=self._download_and_save_data,
                 task_id="download_and_save_data",
-                outlets=[Dataset(f"raw_data_{self._entity.get_endpoint().lower()}")],
+                outlets=[Dataset(dataset)],
             )
 
         return dag

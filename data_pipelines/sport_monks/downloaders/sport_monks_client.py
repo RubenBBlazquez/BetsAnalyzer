@@ -3,15 +3,13 @@ from enum import Enum
 from typing import Any, Iterator
 
 import attr
-from sport_monks.downloaders.entities.country import Country
 from sport_monks.downloaders.entities.entity_base import DownloaderEntityBase
-from sport_monks.downloaders.entities.league import League
-from sport_monks.downloaders.entities.match import Match
-from sport_monks.downloaders.entities.player import Player
-from sport_monks.downloaders.entities.team import Team
-from sport_monks.downloaders.entities.type import Type
 
 from data_pipelines.common.api_client_base import ApiClientBase
+
+DEFAULT_ENGLAND_COUNTRY_ID = 462
+DEFAULT_GERMANY_COUNTRY_ID = 11
+DEFAULT_SPAIN_COUNTRY_ID = 32
 
 
 class SportMonksEndpoints(Enum):
@@ -20,30 +18,15 @@ class SportMonksEndpoints(Enum):
     """
 
     PLAYERS = "players"
+    PLAYERS_SPAIN = f"players/countries/{DEFAULT_SPAIN_COUNTRY_ID}"
+    PLAYERS_ENGLAND = f"players/countries/{DEFAULT_ENGLAND_COUNTRY_ID}"
+    PLAYERS_GERMANY = f"players/countries/{DEFAULT_GERMANY_COUNTRY_ID}"
     TEAMS = "teams"
     LEAGUES = "leagues"
     MATCHES = "fixtures"
     COUNTRIES = "countries"
     TYPES = "types"
-
-
-RAW_DATA_COLLECTIONS_SWITCHER = {
-    SportMonksEndpoints.PLAYERS: "raw_data_players",
-    SportMonksEndpoints.LEAGUES: "raw_data_leagues",
-    SportMonksEndpoints.TEAMS: "raw_data_teams",
-    SportMonksEndpoints.MATCHES: "raw_data_matches",
-    SportMonksEndpoints.COUNTRIES: "raw_data_countries",
-    SportMonksEndpoints.TYPES: "raw_data_types",
-}
-
-DOWNLOADER_ENTITY_SWITCHER = {
-    SportMonksEndpoints.PLAYERS: Player,
-    SportMonksEndpoints.LEAGUES: League,
-    SportMonksEndpoints.TEAMS: Team,
-    SportMonksEndpoints.MATCHES: Match,
-    SportMonksEndpoints.COUNTRIES: Country,
-    SportMonksEndpoints.TYPES: Type,
-}
+    SEASONS = "seasons"
 
 
 @attr.s(auto_attribs=True)
