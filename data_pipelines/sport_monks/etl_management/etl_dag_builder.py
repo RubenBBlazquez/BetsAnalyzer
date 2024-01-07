@@ -48,11 +48,11 @@ def build_sport_monks_dags() -> list[DAG]:
     """
     dag_collector = DagCollector()
 
-    etls = [
-        etl_clean_data_by_leagues(),
+    etl_s = [
+        *etl_clean_data_by_leagues(),
     ]
 
-    for etl in etls:
+    for etl in etl_s:
         dag_collector.add_builder(SportMonksETLDagBuilder(etl))
 
     return dag_collector.collect()
