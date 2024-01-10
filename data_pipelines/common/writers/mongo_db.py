@@ -27,6 +27,7 @@ class MongoDBWriter(IWriter):
 
     def __attrs_post_init__(self):
         self._db_connection = MongoDBConnection().db_conn
+        self.db = self._db_connection.get_database(self._database_name)
 
     def write(self, entities: pd.DataFrame):
         logging.info(
@@ -34,8 +35,4 @@ class MongoDBWriter(IWriter):
             f"from {self._database_name} "
             f"to Mongodb: {entities.shape[0]}"
         )
-        (
-            self._db_connection.get_database(self._database_name)
-            .get_collection(self._collection)
-            .insert_many(entities.to_dict("records"))
-        )
+        self.db.get_collection(self._collection).insert_many(entities.to_dict("records"))

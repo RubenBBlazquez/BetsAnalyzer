@@ -1,8 +1,5 @@
-import logging
 import os
-from datetime import datetime
 
-import numpy as np
 import pandas as pd
 from airflow import Dataset
 from common.extractors.base import ExtractorConfig
@@ -23,11 +20,17 @@ from sport_monks.downloaders.sport_monks_client import (
     DEFAULT_SPAIN_COUNTRY_ID,
     SportMonksEndpoints,
 )
+from sport_monks.etl_management.etls.clean_data_by_leagues.transformations.player_data import (
+    transform_players_data,
+)
 from sport_monks.etl_management.etls.etl_base import ETL
 
 
 def _transform_matches_data(
-    transformed_data: pd.DataFrame, matches: pd.DataFrame, teams: pd.DataFrame
+    transformed_data: pd.DataFrame,
+    matches: pd.DataFrame,
+    teams: pd.DataFrame,
+    players: pd.DataFrame,
 ) -> pd.DataFrame:
     """
     Method to clean matches data
@@ -188,150 +191,6 @@ def _transform_league_data(transformed_data: pd.DataFrame, league: pd.Series):
     return transformed_data
 
 
-def _transform_players_data(
-    transformed_data: pd.DataFrame,
-    players: pd.DataFrame,
-    teams: pd.DataFrame,
-    seasons: pd.DataFrame,
-):
-    current_season = seasons[seasons["is_current"]].season[0]
-    seasons = seasons[~seasons["is_current"]]
-
-    players.loc[players["date_of_birth"] == "None", "date_of_birth"] = datetime.now()
-    players["age"] = (datetime.now() - pd.to_datetime(players["date_of_birth"])).dt.days // 365
-    valid_teams = teams["team_id"].unique()
-
-    current_season_players = pd.concat(teams["players"].apply(pd.DataFrame).to_list()).reset_index(
-        drop=True
-    )
-    current_season_players = current_season_players[["player_id", "team_id", "transfer_id"]]
-    current_season_players["season"] = current_season
-
-    players_by_team_and_season = pd.concat(
-        players["teams"].apply(pd.DataFrame).to_list()
-    ).reset_index(drop=True)
-    players_by_team_and_season = players_by_team_and_season.loc[
-        players_by_team_and_season["team_id"].isin(valid_teams),
-        ["player_id", "team_id", "start", "end", "transfer_id"],
-    ]
-
-    players_by_team_and_season[["start", "end"]] = players_by_team_and_season[
-        ["start", "end"]
-    ].fillna(datetime.now().strftime("%Y-%m-%d"))
-    players_by_team_and_season["start"] = pd.to_datetime(players_by_team_and_season["start"])
-    players_by_team_and_season["start_year"] = players_by_team_and_season["start"].dt.year
-    players_by_team_and_season["start_month"] = players_by_team_and_season["start"].dt.month
-
-    players_by_team_and_season["end"] = pd.to_datetime(players_by_team_and_season["end"])
-    players_by_team_and_season["end_year"] = players_by_team_and_season["end"].dt.year
-    players_by_team_and_season["end_month"] = players_by_team_and_season["end"].dt.month
-
-    players_by_team_and_season["start_season"] = (
-        players_by_team_and_season["start_year"].astype(str)
-        + "/"
-        + (players_by_team_and_season["start_year"] + 1).astype(str)
-    )
-    players_by_team_and_season["end_season"] = (
-        players_by_team_and_season["end_year"].astype(str)
-        + "/"
-        + (players_by_team_and_season["end_year"] + 1).astype(str)
-    )
-    players_by_team_and_season.reset_index(inplace=True)
-
-    for row in players_by_team_and_season.itertuples():
-        date_range = pd.date_range(row.start, row.end, freq="YS", inclusive="left").strftime("%Y")
-        seasons_range = date_range.astype(str) + "/" + (date_range.astype(int) + 1).astype(str)
-        players_by_team_and_season.loc[
-            players_by_team_and_season["index"] == row.index, "seasons_in_team"
-        ] = pd.Series(index=[row.index], data=[",".join(seasons_range.to_list())])
-
-    players_by_team_and_season = players_by_team_and_season[
-        ["player_id", "team_id", "transfer_id", "seasons_in_team"]
-    ].drop_duplicates()
-    season_columns = (
-        players_by_team_and_season["seasons_in_team"]
-        .str.split(",", expand=True)
-        .add_prefix("season_")
-    )
-    players_by_team_and_season = pd.concat(
-        [players_by_team_and_season, season_columns], axis=1
-    ).drop(columns="seasons_in_team")
-    players_by_team_and_season = (
-        players_by_team_and_season.melt(id_vars=["player_id", "team_id", "transfer_id"])
-        .dropna()
-        .drop(columns="variable")
-        .reset_index(drop=True)
-        .rename(columns={"value": "season"})
-    )
-    players_by_team_and_season = players_by_team_and_season[
-        players_by_team_and_season["season"] != ""
-    ]
-
-    for season in seasons.itertuples():
-        logging.info(f"Processing transfers from season {season.season}")
-        transfers = pd.concat(players["transfers"].apply(pd.DataFrame).to_list()).reset_index(
-            drop=True
-        )
-        already_processed_players = players_by_team_and_season[
-            players_by_team_and_season["season"] == season.season
-        ]
-        transfers = transfers[
-            (transfers["date"] != "None")
-            & (transfers["completed"])
-            & (transfers["to_team_id"].isin(valid_teams))
-            & (~transfers["id"].isin(players_by_team_and_season.transfer_id.unique()))
-            & (~transfers["player_id"].isin(already_processed_players.player_id.unique()))
-        ]
-        transfers["date"] = pd.to_datetime(transfers["date"])
-        transfers["year"] = transfers["date"].dt.year
-        transfers["month"] = transfers["date"].dt.month
-
-        season_year_start = pd.to_datetime(season.starting_at).year
-        season_year_end = pd.to_datetime(season.ending_at).year
-        season_month_end = pd.to_datetime(season.ending_at).month
-
-        transfers = transfers[transfers["year"].between(season_year_start, season_year_end)]
-        transfers["season_where_will_play"] = np.where(
-            transfers["month"] >= season_month_end,
-            transfers["year"].astype(str) + "/" + (transfers["year"] + 1).astype(str),
-            f"{season_year_start}/{season_year_end}",
-        )
-
-        # we filter the players that will play in the current season
-        # because that players are already given by the teams endpoint
-        transfers = transfers[transfers["season_where_will_play"] != current_season]
-        transfers = (
-            transfers[["id", "player_id", "to_team_id", "season_where_will_play"]]
-            .drop_duplicates()
-            .reset_index(drop=True)
-            .rename(columns={"to_team_id": "team_id", "season_where_will_play": "season"})
-        )
-        transfers.rename(columns={"id": "transfer_id"}, inplace=True)
-
-        players_by_team_and_season = players_by_team_and_season.append(transfers)
-
-    players_by_team_and_season = pd.concat(
-        [current_season_players, players_by_team_and_season],
-    ).reset_index(drop=True)
-    players_by_team_and_season = players_by_team_and_season.merge(
-        players[["id", "name", "height", "weight", "age"]], left_on="player_id", right_on="id"
-    )
-    players_by_team_and_season.drop(columns=["id", "transfer_id"], inplace=True)
-
-    players_by_team_and_season = (
-        players_by_team_and_season.groupby(by=["team_id", "season"])
-        .apply(lambda row_: row_.to_dict("records"))
-        .reset_index()
-        .rename(columns={0: "players"})
-    )
-
-    transformed_data = transformed_data.merge(
-        players_by_team_and_season, on=["team_id", "season"], how="outer"
-    )
-
-    return transformed_data
-
-
 def transform(raw_data: dict[str, pd.DataFrame]) -> pd.DataFrame:
     transformed_data = pd.DataFrame()
 
@@ -343,9 +202,9 @@ def transform(raw_data: dict[str, pd.DataFrame]) -> pd.DataFrame:
 
     transformed_data = _transform_team_data(transformed_data, teams, players)
     transformed_data = _transform_season_data(transformed_data, seasons)
-    transformed_data = _transform_players_data(transformed_data, players, teams, seasons)
+    transformed_data = transform_players_data(transformed_data, players, teams, seasons, matches)
     transformed_data = _transform_league_data(transformed_data, league)
-    transformed_data = _transform_matches_data(transformed_data, matches, teams)
+    transformed_data = _transform_matches_data(transformed_data, matches, teams, players)
 
     return transformed_data
 

@@ -57,6 +57,17 @@ class DownloaderEntityBase:
         raise NotImplementedError()
 
     @staticmethod
+    def get_dag_name() -> str:
+        """
+        method to obtain dag name for each entity
+
+        Returns
+        -------
+        middle endpoint
+        """
+        return DownloaderEntityBase.get_endpoint()
+
+    @staticmethod
     def get_includes() -> list[str]:
         """
         method to obtain includes in sportMonks for each entity
@@ -65,4 +76,4 @@ class DownloaderEntityBase:
         -------
         list of includes
         """
-        return []
+        raise NotImplementedError()

@@ -103,7 +103,7 @@ class Player(DownloaderEntityBase):
 
 class SpainPlayers(Player):
     """
-    Entity that represents a spain players in sportmonks API
+    Entity that represents a spain player in sportmonks API
     """
 
     @staticmethod
@@ -117,7 +117,7 @@ class SpainPlayers(Player):
 
 class EnglandPlayers(Player):
     """
-    Entity that represents a spain players in sportmonks API
+    Entity that represents an England player in sportmonks API
     """
 
     @staticmethod
@@ -131,7 +131,7 @@ class EnglandPlayers(Player):
 
 class GermanyPlayers(Player):
     """
-    Entity that represents a spain players in sportmonks API
+    Entity that represents a German player in sportmonks API
     """
 
     @staticmethod
