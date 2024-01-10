@@ -22,7 +22,12 @@ def mongo_db_conn():
     return MongoDBConnection().db_conn
 
 
+def pytest_addoption(parser):
+    parser.addoption("--with-docker-compose", action="store", default=False)
+
+
 def pytest_sessionstart(session):
+    use_docker_compose = session.config.getoption("--with-docker-compose")
     os.environ.update(
         {
             "MONGO_HOST": "localhost",
@@ -33,12 +38,20 @@ def pytest_sessionstart(session):
             "PROJECT_DATABASE": "sport_monks",
         }
     )
-    subprocess.run(["docker-compose", "-f", DOCKER_COMPOSE_FILE, "up", "-d", "--build"], check=True)
+
+    if use_docker_compose:
+        subprocess.run(
+            ["docker-compose", "-f", DOCKER_COMPOSE_FILE, "up", "-d", "--build"], check=True
+        )
+        populate_test_database(MongoDBConnection().db_conn)
 
 
 def pytest_sessionfinish(session, exitstatus):
-    MongoDBConnection().db_conn.drop_database("sport_monks_prueba")
-    subprocess.run(["docker-compose", "-f", DOCKER_COMPOSE_FILE, "down", "-v"], check=True)
+    use_docker_compose = session.config.getoption("--with-docker-compose")
+
+    if use_docker_compose:
+        MongoDBConnection().db_conn.drop_database("sport_monks_prueba")
+        subprocess.run(["docker-compose", "-f", DOCKER_COMPOSE_FILE, "down", "-v"], check=True)
 
 
 def populate_test_database(db_conn: MongoClient):

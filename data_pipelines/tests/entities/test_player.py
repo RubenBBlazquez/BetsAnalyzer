@@ -19,6 +19,9 @@ player_data = {
     "weight": 75,
     "date_of_birth": "1990-01-01",
     "gender": "M",
+    "transfers": [],
+    "teams": [],
+    "position": None,
 }
 
 
