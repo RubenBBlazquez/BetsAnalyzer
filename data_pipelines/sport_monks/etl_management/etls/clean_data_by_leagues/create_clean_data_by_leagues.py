@@ -2,10 +2,15 @@ import os
 
 import pandas as pd
 from airflow import Dataset
+from common.etl_base import ETL
 from common.extractors.base import ExtractorConfig
 from common.extractors.mongo_db import MongoDBExtractor
 from common.writers.mongo_db import MongoDBWriter
-from sport_monks.downloaders.constants import (
+from sport_monks.downloaders.entities.league import League
+from sport_monks.downloaders.factories import (
+    DEFAULT_ENGLAND_COUNTRY_ID,
+    DEFAULT_GERMANY_COUNTRY_ID,
+    DEFAULT_SPAIN_COUNTRY_ID,
     RAW_DATA_LEAGUES,
     RAW_DATA_MATCHES,
     RAW_DATA_PLAYERS,
@@ -13,20 +18,13 @@ from sport_monks.downloaders.constants import (
     RAW_DATA_TEAMS,
     RAW_DATA_TYPES,
 )
-from sport_monks.downloaders.entities.league import League
-from sport_monks.downloaders.sport_monks_client import (
-    DEFAULT_ENGLAND_COUNTRY_ID,
-    DEFAULT_GERMANY_COUNTRY_ID,
-    DEFAULT_SPAIN_COUNTRY_ID,
-    SportMonksEndpoints,
-)
+from sport_monks.downloaders.sport_monks_client import SportMonksEndpoints
 from sport_monks.etl_management.etls.clean_data_by_leagues.transformations.matches_data import (
     transform_matches_data,
 )
 from sport_monks.etl_management.etls.clean_data_by_leagues.transformations.player_data import (
     transform_players_data,
 )
-from sport_monks.etl_management.etls.etl_base import ETL
 
 
 def _transform_team_data(

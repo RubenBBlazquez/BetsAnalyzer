@@ -50,13 +50,13 @@ class DownloaderEntityBase:
         raise NotImplementedError()
 
     @property
-    def endpoint(self) -> str:
+    def endpoints(self) -> list[str]:
         """
-        middle endpoint to obtain data in sportMonks for each entity
+        endpoints where you will obtain data in sportMonks for each entity
 
         Returns
         -------
-        middle endpoint
+        list[str]
         """
         raise NotImplementedError()
 
@@ -80,7 +80,10 @@ class DownloaderEntityBase:
         -------
         dag name
         """
-        return self.endpoint.capitalize().replace("/", "_")
+        if len(self.endpoints) == 0:
+            raise NotImplementedError()
+
+        return self.endpoints[0].capitalize().replace("/", "_")
 
     @property
     def includes(self) -> list[str]:

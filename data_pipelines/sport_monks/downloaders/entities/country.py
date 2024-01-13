@@ -41,5 +41,5 @@ class CountriesDownloader(DownloaderEntityBase):
         return "core"
 
     @property
-    def endpoint(self) -> str:
-        return "countries"
+    def endpoints(self) -> list[str]:
+        return ["countries"]

@@ -61,5 +61,5 @@ class TeamsDownloader(DownloaderEntityBase):
         return ["players"]
 
     @property
-    def endpoint(self) -> str:
-        return "teams"
+    def endpoints(self) -> list[str]:
+        return ["teams"]

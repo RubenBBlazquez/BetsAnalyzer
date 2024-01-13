@@ -1,3 +1,4 @@
+import logging
 import os
 from enum import Enum
 from typing import Any, Iterator
@@ -7,10 +8,6 @@ from sport_monks.downloaders.entities.entity_base import DownloaderEntityBase
 
 from data_pipelines.common.api_client_base import ApiClientBase
 
-DEFAULT_ENGLAND_COUNTRY_ID = 462
-DEFAULT_GERMANY_COUNTRY_ID = 11
-DEFAULT_SPAIN_COUNTRY_ID = 32
-
 
 class SportMonksEndpoints(Enum):
     """
@@ -18,15 +15,16 @@ class SportMonksEndpoints(Enum):
     """
 
     PLAYERS = "players"
-    PLAYERS_SPAIN = f"players/countries/{DEFAULT_SPAIN_COUNTRY_ID}"
-    PLAYERS_ENGLAND = f"players/countries/{DEFAULT_ENGLAND_COUNTRY_ID}"
-    PLAYERS_GERMANY = f"players/countries/{DEFAULT_GERMANY_COUNTRY_ID}"
+    PLAYERS_SPAIN = "spain_players"
+    PLAYERS_ENGLAND = "england_players"
+    PLAYERS_GERMANY = "germany_players"
     TEAMS = "teams"
     LEAGUES = "leagues"
     MATCHES = "fixtures"
     COUNTRIES = "countries"
     TYPES = "types"
     SEASONS = "seasons"
+    TOP_SCORERS = "top_scorers"
 
 
 @attr.s(auto_attribs=True)
@@ -40,23 +38,38 @@ class SportMonksClient(ApiClientBase):
         self.api_url = os.getenv("SPORT_MONKS_BASE_URL", default="")
 
     def get_data_in_batches(self, entity: DownloaderEntityBase) -> Iterator[Any]:
-        has_more_pages = True
         page = 1
         per_page = 50
+        endpoints = entity.endpoints
 
-        while has_more_pages:
-            response = self.get(
-                url=f"{self.api_url}/{entity.middle_endpoint}/{entity.endpoint}",
-                params={
-                    "api_token": self.api_key,
-                    "page": page,
-                    "per_page": per_page,
-                    "include": ";".join(entity.includes),
-                },
-            )
+        for endpoint in endpoints:
+            has_more_pages = True
+            logging.info(f"-------------------------------------------")
+            logging.info(f"downloading data from endpoint: {endpoint} ")
 
-            has_more_pages = response["pagination"]["has_more"]
-            page += 1
+            while has_more_pages:
+                response = self.get(
+                    url=f"{self.api_url}/{entity.middle_endpoint}/{endpoint}",
+                    params={
+                        "api_token": self.api_key,
+                        "page": page,
+                        "per_page": per_page,
+                        "include": ";".join(entity.includes),
+                    },
+                )
 
-            entity_wrapper = entity.endpoint_entity_wrapper
-            yield [entity_wrapper.from_dict(data) for data in response["data"]]
+                response_data = response.get("data")
+
+                if not response_data:
+                    logging.info(
+                        f"there's no information with request: {endpoint}, "
+                        f"message: {response.get('message', 'no_message')}"
+                    )
+                    has_more_pages = False
+                    continue
+
+                has_more_pages = response["pagination"]["has_more"]
+                page += 1
+
+                entity_wrapper = entity.endpoint_entity_wrapper
+                yield [entity_wrapper.from_dict(data) for data in response_data]

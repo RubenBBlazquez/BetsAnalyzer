@@ -3,14 +3,13 @@ from datetime import datetime
 
 import attr
 import pandas as pd
-from airflow import Dataset
 from airflow.models.dag import DAG
 from airflow.operators.python import PythonOperator
-from sport_monks.downloaders.constants import (
+from sport_monks.downloaders.entities.entity_base import DownloaderEntityBase
+from sport_monks.downloaders.factories import (
     DOWNLOADER_ENTITY_SWITCHER,
     RAW_DATA_COLLECTIONS_SWITCHER,
 )
-from sport_monks.downloaders.entities.entity_base import DownloaderEntityBase
 from sport_monks.downloaders.sport_monks_client import SportMonksClient, SportMonksEndpoints
 
 from data_pipelines.common.dag_builder import DagCollector, IDagBuilder
@@ -40,7 +39,6 @@ class SportMonksDownloadDagBuilder(IDagBuilder):
         """
         sport_monks_client = SportMonksClient()
         iterator = sport_monks_client.get_data_in_batches(self._entity)
-
         for data in iterator:
             if not len(data):
                 continue
@@ -55,14 +53,10 @@ class SportMonksDownloadDagBuilder(IDagBuilder):
             start_date=datetime(today.year, today.month, today.day),
         )
 
-        endpoint = SportMonksEndpoints(self._entity.endpoint)
-        dataset = RAW_DATA_COLLECTIONS_SWITCHER[endpoint]
-
         with dag:
             PythonOperator(
                 python_callable=self._download_and_save_data,
                 task_id="download_and_save_data",
-                outlets=[Dataset(dataset)],
             )
 
         return dag

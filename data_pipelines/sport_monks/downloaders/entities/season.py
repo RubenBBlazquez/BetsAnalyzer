@@ -34,5 +34,5 @@ class SeasonsDownloader(DownloaderEntityBase):
         return Season
 
     @property
-    def endpoint(self) -> str:
-        return "seasons"
+    def endpoints(self) -> list[str]:
+        return ["seasons"]

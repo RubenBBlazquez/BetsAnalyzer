@@ -3,10 +3,10 @@ from datetime import datetime
 import attr
 from airflow.models.dag import DAG
 from airflow.operators.python import PythonOperator
+from common.etl_base import ETL
 from sport_monks.etl_management.etls.clean_data_by_leagues.create_clean_data_by_leagues import (
     etl_clean_data_by_leagues,
 )
-from sport_monks.etl_management.etls.etl_base import ETL
 
 from data_pipelines.common.dag_builder import DagCollector, IDagBuilder
 

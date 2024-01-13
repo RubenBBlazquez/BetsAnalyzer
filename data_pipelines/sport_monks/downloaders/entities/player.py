@@ -103,8 +103,8 @@ class PlayersDownloader(DownloaderEntityBase):
         return ["position", "teams", "transfers"]
 
     @property
-    def endpoint(self) -> str:
-        return "players"
+    def endpoints(self) -> list[str]:
+        return ["players"]
 
 
 class SpainPlayersDownloader(PlayersDownloader):
@@ -113,8 +113,8 @@ class SpainPlayersDownloader(PlayersDownloader):
     """
 
     @property
-    def endpoint(self) -> str:
-        return "players/countries/32"
+    def endpoints(self) -> list[str]:
+        return ["players/countries/32"]
 
     @property
     def dag_name(self) -> str:
@@ -127,8 +127,8 @@ class EnglandPlayersDownloader(PlayersDownloader):
     """
 
     @property
-    def endpoint(self) -> str:
-        return "players/countries/462"
+    def endpoints(self) -> list[str]:
+        return ["players/countries/462"]
 
     @property
     def dag_name(self) -> str:
@@ -141,8 +141,8 @@ class GermanyPlayersDownloader(PlayersDownloader):
     """
 
     @property
-    def endpoint(self) -> str:
-        return "players/countries/11"
+    def endpoints(self) -> list[str]:
+        return ["players/countries/11"]
 
     @property
     def dag_name(self) -> str:

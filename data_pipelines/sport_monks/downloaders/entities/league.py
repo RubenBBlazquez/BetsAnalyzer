@@ -38,5 +38,5 @@ class LeaguesDownloader(DownloaderEntityBase):
         return League
 
     @property
-    def endpoint(self) -> str:
-        return "leagues"
+    def endpoints(self) -> list[str]:
+        return ["leagues"]

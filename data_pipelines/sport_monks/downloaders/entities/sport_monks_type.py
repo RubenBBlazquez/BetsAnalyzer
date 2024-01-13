@@ -36,5 +36,5 @@ class SportMonksTypesDownloader(DownloaderEntityBase):
         return "core"
 
     @property
-    def endpoint(self) -> str:
-        return "types"
+    def endpoints(self) -> list[str]:
+        return ["types"]

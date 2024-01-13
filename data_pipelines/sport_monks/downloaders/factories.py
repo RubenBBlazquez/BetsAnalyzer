@@ -10,7 +10,12 @@ from sport_monks.downloaders.entities.player import (
 from sport_monks.downloaders.entities.season import SeasonsDownloader
 from sport_monks.downloaders.entities.sport_monks_type import SportMonksTypesDownloader
 from sport_monks.downloaders.entities.team import TeamsDownloader
+from sport_monks.downloaders.entities.top_scorer import TopScorersDownloader
 from sport_monks.downloaders.sport_monks_client import SportMonksEndpoints
+
+DEFAULT_ENGLAND_COUNTRY_ID = 462
+DEFAULT_GERMANY_COUNTRY_ID = 11
+DEFAULT_SPAIN_COUNTRY_ID = 32
 
 RAW_DATA_PLAYERS = f"raw_data_{SportMonksEndpoints.PLAYERS.value}"
 RAW_DATA_LEAGUES = f"raw_data_{SportMonksEndpoints.LEAGUES.value}"
@@ -19,6 +24,7 @@ RAW_DATA_MATCHES = f"raw_data_{SportMonksEndpoints.MATCHES.name.lower()}"
 RAW_DATA_COUNTRIES = f"raw_data_{SportMonksEndpoints.COUNTRIES.value}"
 RAW_DATA_TYPES = f"raw_data_{SportMonksEndpoints.TYPES.value}"
 RAW_DATA_SEASONS = f"raw_data_{SportMonksEndpoints.SEASONS.value}"
+RAW_DATA_TOP_SCORERS = f"raw_data_top_scorers"
 
 RAW_DATA_COLLECTIONS_SWITCHER = {
     SportMonksEndpoints.PLAYERS: RAW_DATA_PLAYERS,
@@ -31,6 +37,7 @@ RAW_DATA_COLLECTIONS_SWITCHER = {
     SportMonksEndpoints.COUNTRIES: RAW_DATA_COUNTRIES,
     SportMonksEndpoints.TYPES: RAW_DATA_TYPES,
     SportMonksEndpoints.SEASONS: RAW_DATA_SEASONS,
+    SportMonksEndpoints.TOP_SCORERS: RAW_DATA_TOP_SCORERS,
 }
 
 DOWNLOADER_ENTITY_SWITCHER = {
@@ -44,4 +51,5 @@ DOWNLOADER_ENTITY_SWITCHER = {
     SportMonksEndpoints.COUNTRIES: CountriesDownloader(),
     SportMonksEndpoints.TYPES: SportMonksTypesDownloader(),
     SportMonksEndpoints.SEASONS: SeasonsDownloader(),
+    SportMonksEndpoints.TOP_SCORERS: TopScorersDownloader(),
 }

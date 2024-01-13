@@ -174,5 +174,5 @@ class MatchesDownloader(DownloaderEntityBase):
         return ["formations", "scores", "venue", "lineups", "weatherReport"]
 
     @property
-    def endpoint(self) -> str:
-        return "fixtures"
+    def endpoints(self) -> list[str]:
+        return ["fixtures"]

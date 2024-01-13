@@ -4,7 +4,7 @@ import subprocess
 import pytest
 from common.db_client.mongo_db_client import MongoDBConnection
 from pymongo import MongoClient
-from sport_monks.downloaders.constants import (
+from sport_monks.downloaders.factories import (
     RAW_DATA_COUNTRIES,
     RAW_DATA_LEAGUES,
     RAW_DATA_MATCHES,
