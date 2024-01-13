@@ -1,6 +1,6 @@
 import pandas as pd
 from sport_monks.etl_management.etls.clean_data_by_leagues.create_clean_data_by_leagues import (
-    _transform_matches_data,
+    transform_matches_data,
 )
 
 RAW_DATA_MATCHES = pd.DataFrame(
@@ -270,7 +270,7 @@ def test_transform_matches_data():
             {"season_id": 853, "team_id": 528, "league_id": 564},
         ]
     )
-    result = _transform_matches_data(transformed_data, RAW_DATA_MATCHES, RAW_DATA_TEAMS)
+    result = transform_matches_data(transformed_data, RAW_DATA_MATCHES, RAW_DATA_TEAMS)
     expected = pd.DataFrame(
         [
             {

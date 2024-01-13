@@ -152,7 +152,9 @@ def etl_clean_data_by_leagues():
         output_collection = f"clean_data_league_{league.name.lower()}"
         input_collections = get_extractors_configuration(league)
 
-        writer = MongoDBWriter(database_name, output_collection)
+        writer = MongoDBWriter(
+            database_name, output_collection, update_fields=["league_id", "season_id", "team_id"]
+        )
         extractor = MongoDBExtractor(
             extractors_config=input_collections, database_name=database_name
         )
@@ -166,7 +168,7 @@ def etl_clean_data_by_leagues():
                 ],
                 writer=writer,
                 extractor=extractor,
-                transform_=transform,
+                transform=transform,
             )
         )
 

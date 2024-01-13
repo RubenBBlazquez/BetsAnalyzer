@@ -22,7 +22,7 @@ class ETL:
         writer to insert data
     _extractor: BaseExtractor
         extractors to obtain data from a service
-    _transform_: callable
+    _transform: callable
         function to transform data
     """
 
@@ -30,7 +30,7 @@ class ETL:
     schedule: str | list[Dataset]
     _writer: IWriter
     _extractor: BaseExtractor
-    _transform_: callable
+    _transform: callable
 
     def extract(self) -> dict[str, pd.DataFrame]:
         """
@@ -42,7 +42,7 @@ class ETL:
         """
         method to transform data
         """
-        return self._transform_(raw_data)
+        return self._transform(raw_data)
 
     def load(self, information: pd.DataFrame) -> None:
         """

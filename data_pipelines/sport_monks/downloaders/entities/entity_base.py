@@ -20,7 +20,7 @@ class SportMonksEntityBase:
         return attr.asdict(self)
 
     @classmethod
-    def from_dict(cls, dict_: dict) -> DownloaderEntityBase:
+    def from_dict(cls, dict_: dict) -> SportMonksEntityBase:
         """
         method to cast dict to entity
 
