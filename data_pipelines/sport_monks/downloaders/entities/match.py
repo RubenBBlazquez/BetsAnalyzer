@@ -1,8 +1,11 @@
-from typing import Optional
+from typing import Optional, Type
 
 import attr
 
-from data_pipelines.sport_monks.downloaders.entities.entity_base import DownloaderEntityBase
+from data_pipelines.sport_monks.downloaders.entities.entity_base import (
+    DownloaderEntityBase,
+    SportMonksEntityBase,
+)
 
 
 @attr.s(auto_attribs=True)
@@ -127,7 +130,7 @@ class MatchFormations:
 
 
 @attr.s(auto_attribs=True)
-class Match(DownloaderEntityBase):
+class Match(SportMonksEntityBase):
     """
     Entity that represents a Match in sportmonks API
     """
@@ -156,17 +159,20 @@ class Match(DownloaderEntityBase):
     lineups: list[MatchLineup]
     weatherreport: Optional[MatchWeatherReport]
 
-    @staticmethod
-    def includes() -> list[str]:
-        """
-        method to obtain includes in sportMonks for each entity
 
-        Returns
-        -------
-        list of includes
-        """
+class MatchesDownloader(DownloaderEntityBase):
+    """
+    Entity that represents the information to create a matches downloader dag
+    """
+
+    @property
+    def endpoint_entity_wrapper(self) -> Type[SportMonksEntityBase]:
+        return Match
+
+    @property
+    def includes(self) -> list[str]:
         return ["formations", "scores", "venue", "lineups", "weatherReport"]
 
-    @staticmethod
-    def get_endpoint() -> str:
+    @property
+    def endpoint(self) -> str:
         return "fixtures"

@@ -1,12 +1,15 @@
-from typing import Optional
+from typing import Optional, Type
 
 import attr
 
-from data_pipelines.sport_monks.downloaders.entities.entity_base import DownloaderEntityBase
+from data_pipelines.sport_monks.downloaders.entities.entity_base import (
+    DownloaderEntityBase,
+    SportMonksEntityBase,
+)
 
 
 @attr.s(auto_attribs=True)
-class TeamPlayer(DownloaderEntityBase):
+class TeamPlayer:
     """
     Entity that represents a Team Player in sportmonks API
     """
@@ -24,7 +27,7 @@ class TeamPlayer(DownloaderEntityBase):
 
 
 @attr.s(auto_attribs=True)
-class Team(DownloaderEntityBase):
+class Team(SportMonksEntityBase):
     """
     Entity that represents a Team in sportmonks API
     """
@@ -43,17 +46,20 @@ class Team(DownloaderEntityBase):
     last_played_at: str
     players: list[TeamPlayer]
 
-    @staticmethod
-    def includes() -> list[str]:
-        """
-        method to obtain includes in sportMonks for each entity
 
-        Returns
-        -------
-        list of includes
-        """
+class TeamsDownloader(DownloaderEntityBase):
+    """
+    Entity that represents the information to create a teams downloader dag
+    """
+
+    @property
+    def endpoint_entity_wrapper(self) -> Type[SportMonksEntityBase]:
+        return Team
+
+    @property
+    def includes(self) -> list[str]:
         return ["players"]
 
-    @staticmethod
-    def get_endpoint() -> str:
+    @property
+    def endpoint(self) -> str:
         return "teams"

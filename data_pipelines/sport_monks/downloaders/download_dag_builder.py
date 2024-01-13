@@ -49,14 +49,13 @@ class SportMonksDownloadDagBuilder(IDagBuilder):
 
     def build(self):
         today = datetime.today()
-        dag_name = self._entity.get_endpoint().capitalize().replace("/", "_")
         dag = DAG(
-            dag_id=f"Downloader_SportMonks_{dag_name}",
+            dag_id=f"Downloader_SportMonks_{self._entity.dag_name}",
             schedule="@daily",
             start_date=datetime(today.year, today.month, today.day),
         )
 
-        endpoint = SportMonksEndpoints(self._entity.get_endpoint())
+        endpoint = SportMonksEndpoints(self._entity.endpoint)
         dataset = RAW_DATA_COLLECTIONS_SWITCHER[endpoint]
 
         with dag:

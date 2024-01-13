@@ -9,32 +9,27 @@ from data_pipelines.sport_monks.downloaders.entities.entity_base import (
 
 
 @attr.s(auto_attribs=True)
-class Country(SportMonksEntityBase):
+class SportMonksType(SportMonksEntityBase):
     """
-    Entity that represents a country in sportmonks API
+    Entity that represents a type in sportmonks API
     """
 
     id: int
-    continent_id: int
     name: str
-    official_name: str
-    fifa_name: str
-    iso2: str
-    iso3: str
-    latitude: str
-    longitude: str
-    borders: Optional[list[str]]
-    image_path: str
+    code: str
+    developer_name: str
+    model_type: str
+    stat_group: Optional[str]
 
 
-class CountriesDownloader(DownloaderEntityBase):
+class SportMonksTypesDownloader(DownloaderEntityBase):
     """
-    Entity that represents the information to create a countries downloader dag
+    Entity that represents the information to create a types downloader dag
     """
 
     @property
     def endpoint_entity_wrapper(self) -> Type[SportMonksEntityBase]:
-        return Country
+        return SportMonksType
 
     @property
     def middle_endpoint(self) -> str:
@@ -42,4 +37,4 @@ class CountriesDownloader(DownloaderEntityBase):
 
     @property
     def endpoint(self) -> str:
-        return "countries"
+        return "types"

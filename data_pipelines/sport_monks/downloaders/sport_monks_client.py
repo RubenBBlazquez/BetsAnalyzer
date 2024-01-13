@@ -46,12 +46,12 @@ class SportMonksClient(ApiClientBase):
 
         while has_more_pages:
             response = self.get(
-                url=f"{self.api_url}/{entity.get_middle_endpoint()}/{entity.get_endpoint()}",
+                url=f"{self.api_url}/{entity.middle_endpoint()}/{entity.endpoint()}",
                 params={
                     "api_token": self.api_key,
                     "page": page,
                     "per_page": per_page,
-                    "include": ";".join(entity.get_includes()),
+                    "include": ";".join(entity.includes()),
                 },
             )
 

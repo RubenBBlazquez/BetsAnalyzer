@@ -1,15 +1,15 @@
-from sport_monks.downloaders.entities.country import Country
-from sport_monks.downloaders.entities.league import League
-from sport_monks.downloaders.entities.match import Match
+from sport_monks.downloaders.entities.country import CountriesDownloader
+from sport_monks.downloaders.entities.league import LeaguesDownloader
+from sport_monks.downloaders.entities.match import MatchesDownloader
 from sport_monks.downloaders.entities.player import (
-    EnglandPlayers,
-    GermanyPlayers,
-    Player,
-    SpainPlayers,
+    EnglandPlayersDownloader,
+    GermanyPlayersDownloader,
+    PlayersDownloader,
+    SpainPlayersDownloader,
 )
-from sport_monks.downloaders.entities.season import Season
-from sport_monks.downloaders.entities.team import Team
-from sport_monks.downloaders.entities.type import Type
+from sport_monks.downloaders.entities.season import SeasonsDownloader
+from sport_monks.downloaders.entities.sport_monks_type import SportMonksTypesDownloader
+from sport_monks.downloaders.entities.team import TeamsDownloader
 from sport_monks.downloaders.sport_monks_client import SportMonksEndpoints
 
 RAW_DATA_PLAYERS = f"raw_data_{SportMonksEndpoints.PLAYERS.value}"
@@ -34,14 +34,14 @@ RAW_DATA_COLLECTIONS_SWITCHER = {
 }
 
 DOWNLOADER_ENTITY_SWITCHER = {
-    SportMonksEndpoints.PLAYERS: Player,
-    SportMonksEndpoints.PLAYERS_ENGLAND: EnglandPlayers,
-    SportMonksEndpoints.PLAYERS_GERMANY: GermanyPlayers,
-    SportMonksEndpoints.PLAYERS_SPAIN: SpainPlayers,
-    SportMonksEndpoints.LEAGUES: League,
-    SportMonksEndpoints.TEAMS: Team,
-    SportMonksEndpoints.MATCHES: Match,
-    SportMonksEndpoints.COUNTRIES: Country,
-    SportMonksEndpoints.TYPES: Type,
-    SportMonksEndpoints.SEASONS: Season,
+    SportMonksEndpoints.PLAYERS: PlayersDownloader(),
+    SportMonksEndpoints.PLAYERS_ENGLAND: EnglandPlayersDownloader(),
+    SportMonksEndpoints.PLAYERS_GERMANY: GermanyPlayersDownloader(),
+    SportMonksEndpoints.PLAYERS_SPAIN: SpainPlayersDownloader(),
+    SportMonksEndpoints.LEAGUES: LeaguesDownloader(),
+    SportMonksEndpoints.TEAMS: TeamsDownloader(),
+    SportMonksEndpoints.MATCHES: MatchesDownloader(),
+    SportMonksEndpoints.COUNTRIES: CountriesDownloader(),
+    SportMonksEndpoints.TYPES: SportMonksTypesDownloader(),
+    SportMonksEndpoints.SEASONS: SeasonsDownloader(),
 }

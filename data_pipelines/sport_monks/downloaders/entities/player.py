@@ -1,8 +1,11 @@
-from typing import Optional
+from typing import Optional, Type
 
 import attr
 
-from data_pipelines.sport_monks.downloaders.entities.entity_base import DownloaderEntityBase
+from data_pipelines.sport_monks.downloaders.entities.entity_base import (
+    DownloaderEntityBase,
+    SportMonksEntityBase,
+)
 
 
 @attr.s(auto_attribs=True)
@@ -58,7 +61,7 @@ class PlayerTeam:
 
 
 @attr.s(auto_attribs=True)
-class Player(DownloaderEntityBase):
+class Player(SportMonksEntityBase):
     """
     Entity that represents a player in sportmonks API
     """
@@ -85,59 +88,62 @@ class Player(DownloaderEntityBase):
     transfers: Optional[list[PlayerTransfer]]
     position: Optional[PlayerPosition]
 
-    @staticmethod
-    def get_includes() -> list[str]:
-        """
-        method to obtain includes in sportMonks for each entity
 
-        Returns
-        -------
-        list of includes
-        """
+class PlayersDownloader(DownloaderEntityBase):
+    """
+    Entity that represents the information to create a players downloader dag
+    """
+
+    @property
+    def endpoint_entity_wrapper(self) -> Type[SportMonksEntityBase]:
+        return Player
+
+    @property
+    def includes(self) -> list[str]:
         return ["position", "teams", "transfers"]
 
-    @staticmethod
-    def get_endpoint() -> str:
+    @property
+    def endpoint(self) -> str:
         return "players"
 
 
-class SpainPlayers(Player):
+class SpainPlayersDownloader(PlayersDownloader):
     """
-    Entity that represents a spain player in sportmonks API
+    Entity that represents the information to create a spain players downloader dag
     """
 
-    @staticmethod
-    def get_endpoint() -> str:
+    @property
+    def endpoint(self) -> str:
         return "players/countries/32"
 
-    @staticmethod
-    def get_includes() -> list[str]:
-        return ["position", "teams", "transfers"]
+    @property
+    def dag_name(self) -> str:
+        return "spain_players"
 
 
-class EnglandPlayers(Player):
+class EnglandPlayersDownloader(PlayersDownloader):
     """
-    Entity that represents an England player in sportmonks API
+    Entity that represents the information to create a england players downloader dag
     """
 
-    @staticmethod
-    def get_endpoint() -> str:
+    @property
+    def endpoint(self) -> str:
         return "players/countries/462"
 
-    @staticmethod
-    def get_includes() -> list[str]:
-        return ["position", "teams", "transfers"]
+    @property
+    def dag_name(self) -> str:
+        return "england_players"
 
 
-class GermanyPlayers(Player):
+class GermanyPlayersDownloader(PlayersDownloader):
     """
-    Entity that represents a German player in sportmonks API
+    Entity that represents the information to create a germany players downloader dag
     """
 
-    @staticmethod
-    def get_endpoint() -> str:
+    @property
+    def endpoint(self) -> str:
         return "players/countries/11"
 
-    @staticmethod
-    def get_includes() -> list[str]:
-        return ["position", "teams", "transfers"]
+    @property
+    def dag_name(self) -> str:
+        return "germany_players"

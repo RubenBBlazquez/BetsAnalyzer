@@ -1,17 +1,14 @@
 from __future__ import annotations
 
 from copy import deepcopy
+from typing import Type
 
 import attr
 import cattrs
 
 
 @attr.s(auto_attribs=True)
-class DownloaderEntityBase:
-    """
-    Base Downloader Entity information
-    """
-
+class SportMonksEntityBase:
     def to_dict(self) -> dict:
         """
         method to convert entity to dict
@@ -34,8 +31,37 @@ class DownloaderEntityBase:
         converter = deepcopy(cattrs.global_converter)
         return converter.structure(dict_, cls)
 
-    @staticmethod
-    def get_middle_endpoint() -> str:
+
+@attr.s(auto_attribs=True)
+class DownloaderEntityBase:
+    """
+    Base Downloader Entity information
+    """
+
+    @property
+    def endpoint_entity_wrapper(self) -> Type:
+        """
+        method to obtain the entity that wraps the endpoint data from sportMonks
+
+        Returns
+        -------
+        endpoint entity wrapper
+        """
+        raise NotImplementedError()
+
+    @property
+    def endpoint(self) -> str:
+        """
+        middle endpoint to obtain data in sportMonks for each entity
+
+        Returns
+        -------
+        middle endpoint
+        """
+        raise NotImplementedError()
+
+    @property
+    def middle_endpoint(self) -> str:
         """
         middle endpoint to obtain data in sportMonks for each entity
 
@@ -45,30 +71,19 @@ class DownloaderEntityBase:
         """
         return "football"
 
-    @staticmethod
-    def get_endpoint() -> str:
-        """
-        middle endpoint to obtain data in sportMonks for each entity
-
-        Returns
-        -------
-        middle endpoint
-        """
-        raise NotImplementedError()
-
-    @staticmethod
-    def get_dag_name() -> str:
+    @property
+    def dag_name(self) -> str:
         """
         method to obtain dag name for each entity
 
         Returns
         -------
-        middle endpoint
+        dag name
         """
-        return DownloaderEntityBase.get_endpoint()
+        return self.endpoint.capitalize().replace("/", "_")
 
-    @staticmethod
-    def get_includes() -> list[str]:
+    @property
+    def includes(self) -> list[str]:
         """
         method to obtain includes in sportMonks for each entity
 
@@ -76,4 +91,4 @@ class DownloaderEntityBase:
         -------
         list of includes
         """
-        raise NotImplementedError()
+        return []
