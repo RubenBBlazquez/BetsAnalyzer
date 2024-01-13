@@ -39,7 +39,7 @@ class DownloaderEntityBase:
     """
 
     @property
-    def endpoint_entity_wrapper(self) -> Type:
+    def endpoint_entity_wrapper(self) -> Type[SportMonksEntityBase]:
         """
         method to obtain the entity that wraps the endpoint data from sportMonks
 
@@ -92,3 +92,14 @@ class DownloaderEntityBase:
         list of includes
         """
         return []
+
+    @property
+    def update_fields(self) -> list[str]:
+        """
+        method to obtain the fields by which we are going to update/upsert the data
+
+        Returns
+        -------
+        list of update fields
+        """
+        return ["id"]

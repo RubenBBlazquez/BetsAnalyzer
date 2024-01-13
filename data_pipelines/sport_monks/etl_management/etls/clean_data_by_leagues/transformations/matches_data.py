@@ -34,10 +34,6 @@ def transform_match_scores(matches: pd.DataFrame, teams: pd.DataFrame):
     )
     match_teams.drop(columns="name", inplace=True)
 
-    import web_pdb
-
-    web_pdb.set_trace()
-
     match_scores = match_scores.merge(
         match_teams, left_on=["participant_id", "match_id"], right_on=["team_id", "match_id"]
     )

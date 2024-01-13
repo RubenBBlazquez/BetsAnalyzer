@@ -77,7 +77,11 @@ def build_sport_monks_dags() -> list[DAG]:
     for endpoint in SportMonksEndpoints:
         entity = DOWNLOADER_ENTITY_SWITCHER[endpoint]
         raw_data_collection = RAW_DATA_COLLECTIONS_SWITCHER[endpoint]
-        writer = MongoDBWriter(os.getenv("PROJECT_DATABASE", "sport_monks"), raw_data_collection)
+        writer = MongoDBWriter(
+            os.getenv("PROJECT_DATABASE", "sport_monks"),
+            raw_data_collection,
+            update_fields=entity.update_fields,
+        )
 
         dag_collector.add_builder(SportMonksDownloadDagBuilder(entity, writer))
 
