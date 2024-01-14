@@ -147,7 +147,7 @@ def etl_clean_data_by_leagues():
     database_name = os.getenv("PROJECT_DATABASE", "sport_monks")
 
     for league in get_leagues():
-        output_collection = f"clean_data_league_{league.name.lower()}"
+        output_collection = f"clean_data_league_{league.name.lower().replace(' ', '_')}"
         input_collections = get_extractors_configuration(league)
 
         writer = MongoDBWriter(

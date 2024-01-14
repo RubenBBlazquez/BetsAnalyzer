@@ -38,18 +38,19 @@ class SportMonksClient(ApiClientBase):
         self.api_url = os.getenv("SPORT_MONKS_BASE_URL", default="")
 
     def get_data_in_batches(self, entity: DownloaderEntityBase) -> Iterator[Any]:
-        page = 1
         per_page = 50
         endpoints = entity.endpoints
 
         for endpoint in endpoints:
+            page = 1
             has_more_pages = True
+            endpoint_url = f"{self.api_url}/{entity.middle_endpoint}/{endpoint}"
             logging.info(f"-------------------------------------------")
-            logging.info(f"downloading data from endpoint: {endpoint} ")
+            logging.info(f"downloading data from endpoint: {endpoint_url} ")
 
             while has_more_pages:
                 response = self.get(
-                    url=f"{self.api_url}/{entity.middle_endpoint}/{endpoint}",
+                    url=endpoint_url,
                     params={
                         "api_token": self.api_key,
                         "page": page,

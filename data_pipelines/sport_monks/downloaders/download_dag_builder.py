@@ -39,6 +39,7 @@ class SportMonksDownloadDagBuilder(IDagBuilder):
         """
         sport_monks_client = SportMonksClient()
         iterator = sport_monks_client.get_data_in_batches(self._entity)
+
         for data in iterator:
             if not len(data):
                 continue
