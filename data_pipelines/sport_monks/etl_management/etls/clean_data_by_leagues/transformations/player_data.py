@@ -5,6 +5,66 @@ import numpy as np
 import pandas as pd
 
 
+def transform_player_statistics(
+    player_statistics: pd.DataFrame,
+    players: pd.DataFrame,
+    seasons: pd.DataFrame,
+):
+    player_statistics = player_statistics[
+        player_statistics["player_id"].isin(players.player_id.unique())
+    ]
+    player_statistics = player_statistics[
+        ["participant_id", "player_id", "season_id", "total", "type_id", "type"]
+    ]
+    player_statistics.rename(columns={"participant_id": "team_id"}, inplace=True)
+    player_statistics["season"] = player_statistics["season_id"].map(
+        seasons.set_index("season_id")["season"]
+    )
+    player_statistics.drop(columns=["season_id"], inplace=True)
+
+    unique_type_ids = player_statistics["type_id"].fillna(0).unique()
+    statistic_type_columns = []
+    players_statistics_by_team_and_season = players[
+        ["player_id", "team_id", "season"]
+    ].drop_duplicates()
+
+    for type_id in unique_type_ids:
+        if not type_id:
+            continue
+
+        type_id_condition = player_statistics["type_id"] == type_id
+
+        # we take the first row because all the rows have the same type details
+        type_details = (
+            player_statistics[type_id_condition]["type"]
+            .apply(pd.Series)
+            .drop(columns=["id"])
+            .iloc[0]
+        )
+        type_name_key = f"season_{type_details['name'].lower().replace(' ', '_')}"
+        statistic_type_columns.append(type_name_key)
+
+        players_statistics_by_team_and_season = pd.merge(
+            players_statistics_by_team_and_season,
+            player_statistics[type_id_condition][["player_id", "team_id", "season", "total"]],
+            on=["player_id", "team_id", "season"],
+            how="left",
+        ).rename(columns={"total": type_name_key})
+        players_statistics_by_team_and_season[type_name_key].fillna(0, inplace=True)
+
+    players_statistics_by_team_and_season.sort_values(
+        by=["player_id", "season"], ascending=True, inplace=True
+    )
+    last_season_statistics_columns = [f"previous_{column}" for column in statistic_type_columns]
+    players_statistics_by_team_and_season[
+        last_season_statistics_columns
+    ] = players_statistics_by_team_and_season.groupby("player_id")[statistic_type_columns].shift(1)
+    players_statistics_by_team_and_season.drop(columns=statistic_type_columns, inplace=True)
+    players_statistics_by_team_and_season.fillna(0, inplace=True)
+
+    return players_statistics_by_team_and_season
+
+
 def _transform_matches_lineups(matches: pd.DataFrame, seasons: pd.DataFrame):
     """
     Transforms the matches data to get the lineups of each match and each_season
@@ -159,7 +219,7 @@ def transform_player_transfers(
         transfers = valid_player_transfers[
             valid_player_transfers["year"].between(season_year_start, season_year_end)
         ]
-        transfers["season_where_will_play"] = np.where(
+        transfers.loc[:, "season_where_will_play"] = np.where(
             transfers["month"] >= season_month_end,
             transfers["year"].astype(str) + "/" + (transfers["year"] + 1).astype(str),
             f"{season_year_start}/{season_year_end}",
@@ -182,12 +242,14 @@ def transform_player_transfers(
 def transform_players_data(
     final_data: pd.DataFrame,
     players: pd.DataFrame,
+    player_statistics: pd.DataFrame,
     teams: pd.DataFrame,
     seasons: pd.DataFrame,
+    league_seasons: pd.DataFrame,
     matches: pd.DataFrame,
 ):
-    current_season = seasons[seasons["is_current"]].season[0]
-    seasons = seasons[~seasons["is_current"]]
+    current_season = league_seasons[league_seasons["is_current"]].season.iloc[0]
+    league_seasons = league_seasons[~league_seasons["is_current"]]
 
     players.loc[players["date_of_birth"] == "None", "date_of_birth"] = datetime.now()
     players["age"] = (datetime.now() - pd.to_datetime(players["date_of_birth"])).dt.days // 365
@@ -199,9 +261,11 @@ def transform_players_data(
     current_season_players = current_season_players[["player_id", "team_id", "transfer_id"]]
     current_season_players["season"] = current_season
 
-    matches_lineups = _transform_matches_lineups(matches, seasons)
+    matches_lineups = _transform_matches_lineups(matches, league_seasons)
     player_teams = transform_teams_where_players_have_been_playing(valid_teams, players)
-    player_transfers = transform_player_transfers(players, valid_teams, seasons, current_season)
+    player_transfers = transform_player_transfers(
+        players, valid_teams, league_seasons, current_season
+    )
 
     players_by_team_and_season = (
         pd.concat(
@@ -215,6 +279,13 @@ def transform_players_data(
         players[["id", "name", "height", "weight", "age"]], left_on="player_id", right_on="id"
     )
     players_by_team_and_season.drop(columns=["id"], inplace=True)
+    previous_season_statistics_per_player = transform_player_statistics(
+        player_statistics, players_by_team_and_season, seasons
+    )
+    players_by_team_and_season = players_by_team_and_season.merge(
+        previous_season_statistics_per_player, on=["player_id", "team_id", "season"], how="left"
+    )
+
     players_by_team_and_season = (
         players_by_team_and_season.groupby(by=["team_id", "season"])
         .apply(lambda row_: row_.to_dict("records"))

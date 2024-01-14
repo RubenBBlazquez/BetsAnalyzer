@@ -16,6 +16,7 @@ from sport_monks.downloaders.factories import (
     RAW_DATA_PLAYERS,
     RAW_DATA_SEASONS,
     RAW_DATA_TEAMS,
+    RAW_DATA_TOP_SCORERS,
     RAW_DATA_TYPES,
 )
 from sport_monks.downloaders.sport_monks_client import SportMonksEndpoints
@@ -27,9 +28,7 @@ from sport_monks.etl_management.etls.clean_data_by_leagues.transformations.playe
 )
 
 
-def _transform_team_data(
-    transformed_data: pd.DataFrame, teams: pd.DataFrame, players: pd.DataFrame
-):
+def _transform_team_data(transformed_data: pd.DataFrame, teams: pd.DataFrame):
     """
     Method to transform team data
 
@@ -39,8 +38,6 @@ def _transform_team_data(
         transformed data
     teams: pd.DataFrame
         teams data
-    players: pd.DataFrame
-        players data
     """
     teams.rename(columns={"id": "team_id"}, inplace=True)
 
@@ -53,9 +50,8 @@ def _transform_team_data(
 def _transform_season_data(transformed_data: pd.DataFrame, seasons: pd.DataFrame):
     # we create an aux index to be able to get the teams by seasons
     # so if we have 2 seasons, we will have 2 rows for each team
-    transformed_data["aux_index"] = 1
-    seasons["aux_index"] = 1
-    seasons.rename(columns={"id": "season_id", "name": "season"}, inplace=True)
+    transformed_data.loc[:, "aux_index"] = 1
+    seasons.loc[:, "aux_index"] = 1
 
     transformed_data = transformed_data.merge(
         seasons[["aux_index", "season", "season_id"]], on="aux_index"
@@ -75,15 +71,19 @@ def _transform_league_data(transformed_data: pd.DataFrame, league: pd.Series):
 def transform(raw_data: dict[str, pd.DataFrame]) -> pd.DataFrame:
     transformed_data = pd.DataFrame()
 
-    seasons = raw_data[RAW_DATA_SEASONS]
+    seasons = raw_data[RAW_DATA_SEASONS].rename(columns={"id": "season_id", "name": "season"})
     matches = raw_data[RAW_DATA_MATCHES].rename(columns={"id": "match_id"})
     players = raw_data[RAW_DATA_PLAYERS]
+    player_statistics = raw_data[RAW_DATA_TOP_SCORERS]
     teams = raw_data[RAW_DATA_TEAMS]
     league = raw_data[RAW_DATA_LEAGUES].iloc[0]
+    league_seasons = seasons[seasons["league_id"] == league["id"]]
 
-    transformed_data = _transform_team_data(transformed_data, teams, players)
-    transformed_data = _transform_season_data(transformed_data, seasons)
-    transformed_data = transform_players_data(transformed_data, players, teams, seasons, matches)
+    transformed_data = _transform_team_data(transformed_data, teams)
+    transformed_data = _transform_season_data(transformed_data, league_seasons)
+    transformed_data = transform_players_data(
+        transformed_data, players, player_statistics, teams, seasons, league_seasons, matches
+    )
     transformed_data = _transform_league_data(transformed_data, league)
     transformed_data = transform_matches_data(transformed_data, matches, teams)
 
@@ -132,10 +132,11 @@ def get_extractors_configuration(league: League):
             query={"league_id": league.id},
         ),
         ExtractorConfig(RAW_DATA_TEAMS, query={"country_id": league.country_id}),
-        ExtractorConfig(RAW_DATA_SEASONS, query={"league_id": league.id}),
+        ExtractorConfig(RAW_DATA_SEASONS, query={}),
         ExtractorConfig(RAW_DATA_TYPES, query={}),
         ExtractorConfig(RAW_DATA_PLAYERS, query={}),
         ExtractorConfig(RAW_DATA_LEAGUES, query={"id": league.id}),
+        ExtractorConfig(RAW_DATA_TOP_SCORERS, query={}),
     ]
 
 
