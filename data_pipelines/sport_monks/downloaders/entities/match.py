@@ -117,7 +117,7 @@ class MatchScores:
 
 
 @attr.s(auto_attribs=True)
-class MatchFormations:
+class MatchFormation:
     """
     Entity that represents a Match Formation in sportmonks API
     """
@@ -127,6 +127,31 @@ class MatchFormations:
     participant_id: int
     formation: str
     location: str
+
+
+@attr.s(auto_attribs=True)
+class MatchEvent:
+    """
+    Entity that represents a Match Event in sportmonks API
+    """
+
+    period_id: Optional[int]
+    participant_id: int
+    type_id: int
+    section: str
+    player_id: Optional[int]
+    related_player_id: Optional[int]
+    player_name: str
+    related_player_name: Optional[str]
+    result: Optional[str]
+    info: Optional[str]
+    addition: Optional[str]
+    minute: int
+    extra_minute: Optional[str]
+    injured: Optional[str]
+    on_bench: bool
+    coach_id: Optional[str]
+    sub_type_id: Optional[str]
 
 
 @attr.s(auto_attribs=True)
@@ -153,11 +178,12 @@ class Match(SportMonksEntityBase):
     placeholder: bool
     has_odds: bool
     starting_at_timestamp: int
-    formations: list[MatchFormations]
+    formations: list[MatchFormation]
     scores: list[MatchScores]
     venue: Optional[MatchStadium]
     lineups: list[MatchLineup]
     weatherreport: Optional[MatchWeatherReport]
+    events: list[MatchEvent]
 
 
 class MatchesDownloader(DownloaderEntityBase):
@@ -171,7 +197,7 @@ class MatchesDownloader(DownloaderEntityBase):
 
     @property
     def includes(self) -> list[str]:
-        return ["formations", "scores", "venue", "lineups", "weatherReport"]
+        return ["formations", "scores", "venue", "lineups", "weatherReport", "events"]
 
     @property
     def endpoints(self) -> list[str]:
