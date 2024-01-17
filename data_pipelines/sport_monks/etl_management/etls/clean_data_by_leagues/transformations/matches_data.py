@@ -51,14 +51,80 @@ def transform_match_scores(matches: pd.DataFrame, teams: pd.DataFrame):
     )
 
 
-def get_home_matches():
-    pass
+def transform_match_events(matches: pd.DataFrame, types: pd.DataFrame):
+    """
+    method to transform match events
+
+    Parameters
+    ----------
+    matches: pd.DataFrame
+        matches data
+    types: pd.DataFrame
+        types data
+    """
+    # we set the index as the match id because events are
+    # lists of dicts and don't have the match id to reference it later
+    matches_events = pd.concat(
+        matches.apply(
+            lambda row: pd.DataFrame(row["events"], index=[row["match_id"]] * len(row["events"])),
+            axis=1,
+        ).to_list()
+    )
+    matches_events = matches_events.reset_index().rename(columns={"index": "match_id"})
+    matches_events = matches_events[
+        ["match_id", "type_id", "participant_id", "player_id", "player_name", "result"]
+    ]
+    matches_events = matches_events.merge(types[["id", "name"]], left_on="type_id", right_on="id")
+    matches_events.drop(columns=["id"], inplace=True)
+    matches_events.rename(columns={"name": "type"}, inplace=True)
+    matches_events["type"] = matches_events["type"].str.lower().replace(" ", "_")
+
+    return matches_events
+
+
+def transform_lineups(matches: pd.DataFrame, match_events: pd.DataFrame):
+    """
+    method to transform lineups as home_players and away_players
+
+    Parameters
+    ----------
+    matches: pd.DataFrame
+        matches data
+    match_events: pd.DataFrame
+        match events data
+    """
+    match_lineups = pd.concat(matches["lineups"].apply(pd.DataFrame).to_list())
+    match_lineups = match_lineups[["fixture_id", "team_id", "player_id", "player_name"]]
+    match_events = match_events[["match_id", "player_id", "type"]]
+
+    # now we reset the index to count the number of events per player, match and type
+    match_events = match_events.reset_index().rename(columns={"index": "count"})
+    events_count_per_player_match_and_type = (
+        match_events.groupby(["match_id", "player_id", "type"])
+        .count()
+        .reset_index()
+        .pivot(index=["match_id", "player_id"], columns="type", values="count")
+        .reset_index()
+    )
+    events_count_per_player_match_and_type = events_count_per_player_match_and_type.merge(
+        matches[["match_id", "duration"]], on="match_id"
+    )
+
+    # now we get the players that have substitutions to get the duration that they played
+    match_players_with_substitutions = events_count_per_player_match_and_type.loc[
+        ~events_count_per_player_match_and_type["substitution"].isna(), ["match_id", "player_id"]
+    ]
+    substitutions = match_events.loc[
+        (match_events["match_id"] == match_players_with_substitutions["match_id"])
+        & (match_events["player_id"] == match_players_with_substitutions["player_id"]),
+        ["match_id", "player_id", "minute"],
+    ]
+
+    return substitutions
 
 
 def transform_matches_data(
-    final_data: pd.DataFrame,
-    matches: pd.DataFrame,
-    teams: pd.DataFrame,
+    final_data: pd.DataFrame, matches: pd.DataFrame, teams: pd.DataFrame, types: pd.DataFrame
 ) -> pd.DataFrame:
     """
     Method to clean matches data
@@ -71,6 +137,8 @@ def transform_matches_data(
         matches data
     teams: pd.DataFrame
         teams data
+    types: pd.DataFrame
+        types data
 
     Returns
     -------
@@ -78,6 +146,7 @@ def transform_matches_data(
         tuple of clean data for home and away matches
     """
     match_scores = transform_match_scores(matches, teams)
+    match_events = transform_match_events(matches, types)
 
     clean_data_matches = matches[
         [
@@ -100,6 +169,8 @@ def transform_matches_data(
         inplace=True,
     )
     clean_data_matches = clean_data_matches.merge(match_scores, on="match_id")
+
+    transform_lineups(clean_data_matches, match_events)
 
     clean_data_home_matches = (
         clean_data_matches.groupby(["season_id", "league_id", "team_id_home"])

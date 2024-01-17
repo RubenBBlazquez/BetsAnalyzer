@@ -76,6 +76,7 @@ def transform(raw_data: dict[str, pd.DataFrame]) -> pd.DataFrame:
     players = raw_data[RAW_DATA_PLAYERS]
     player_statistics = raw_data[RAW_DATA_TOP_SCORERS]
     teams = raw_data[RAW_DATA_TEAMS]
+    types = raw_data[RAW_DATA_TYPES]
     league = raw_data[RAW_DATA_LEAGUES].iloc[0]
     league_seasons = seasons[seasons["league_id"] == league["id"]]
 
@@ -85,7 +86,7 @@ def transform(raw_data: dict[str, pd.DataFrame]) -> pd.DataFrame:
         transformed_data, players, player_statistics, teams, seasons, league_seasons, matches
     )
     transformed_data = _transform_league_data(transformed_data, league)
-    transformed_data = transform_matches_data(transformed_data, matches, teams)
+    transformed_data = transform_matches_data(transformed_data, matches, teams, types)
 
     return transformed_data
 

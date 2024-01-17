@@ -270,7 +270,9 @@ def test_transform_matches_data():
             {"season_id": 853, "team_id": 528, "league_id": 564},
         ]
     )
-    result = transform_matches_data(transformed_data, RAW_DATA_MATCHES, RAW_DATA_TEAMS)
+    result = transform_matches_data(
+        transformed_data, RAW_DATA_MATCHES, RAW_DATA_TEAMS, RAW_DATA_TEAMS
+    )
     expected = pd.DataFrame(
         [
             {
