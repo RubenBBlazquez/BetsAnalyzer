@@ -72,17 +72,26 @@ def transform_match_events(matches: pd.DataFrame, types: pd.DataFrame):
     )
     matches_events = matches_events.reset_index().rename(columns={"index": "match_id"})
     matches_events = matches_events[
-        ["match_id", "type_id", "participant_id", "player_id", "player_name", "result"]
+        [
+            "match_id",
+            "type_id",
+            "participant_id",
+            "player_id",
+            "related_player_id",
+            "result",
+            "minute",
+            "injured",
+        ]
     ]
     matches_events = matches_events.merge(types[["id", "name"]], left_on="type_id", right_on="id")
     matches_events.drop(columns=["id"], inplace=True)
-    matches_events.rename(columns={"name": "type"}, inplace=True)
+    matches_events.rename(columns={"name": "type", "participant_id": "team_id"}, inplace=True)
     matches_events["type"] = matches_events["type"].str.lower().replace(" ", "_")
 
     return matches_events
 
 
-def transform_lineups(matches: pd.DataFrame, match_events: pd.DataFrame):
+def transform_lineups(matches: pd.DataFrame, match_events: pd.DataFrame, types: pd.DataFrame):
     """
     method to transform lineups as home_players and away_players
 
@@ -92,35 +101,134 @@ def transform_lineups(matches: pd.DataFrame, match_events: pd.DataFrame):
         matches data
     match_events: pd.DataFrame
         match events data
+    types: pd.DataFrame
+        types data
     """
     match_lineups = pd.concat(matches["lineups"].apply(pd.DataFrame).to_list())
-    match_lineups = match_lineups[["fixture_id", "team_id", "player_id", "player_name"]]
-    match_events = match_events[["match_id", "player_id", "type"]]
+    match_lineups = match_lineups[["fixture_id", "team_id", "player_id", "player_name", "type_id"]]
+    match_lineups = match_lineups.merge(types[["id", "code"]], left_on="type_id", right_on="id")
+    match_lineups.drop(columns=["id"], inplace=True)
+    match_lineups.rename(columns={"fixture_id": "match_id", "code": "type"}, inplace=True)
+    match_lineups["duration"] = match_lineups["match_id"].map(
+        matches.set_index("match_id")["duration"]
+    )
+
+    match_events = match_events[
+        ["match_id", "player_id", "related_player_id", "team_id", "type", "minute", "injured"]
+    ]
 
     # now we reset the index to count the number of events per player, match and type
     match_events = match_events.reset_index().rename(columns={"index": "count"})
     events_count_per_player_match_and_type = (
-        match_events.groupby(["match_id", "player_id", "type"])
+        match_events.drop(columns=["minute", "injured"])
+        .groupby(["match_id", "team_id", "player_id", "type"])
         .count()
         .reset_index()
-        .pivot(index=["match_id", "player_id"], columns="type", values="count")
+        .pivot(index=["match_id", "team_id", "player_id"], columns="type", values="count")
         .reset_index()
     )
+    statistics_columns = events_count_per_player_match_and_type.columns[3:]
+
     events_count_per_player_match_and_type = events_count_per_player_match_and_type.merge(
-        matches[["match_id", "duration"]], on="match_id"
+        matches[["match_id", "date", "season_id"]], on=["match_id"]
+    )
+    events_count_per_player_match_and_type.rename(columns={"date": "match_date"}, inplace=True)
+
+    # now we get the players that have substitutions to set the duration that they played in the match
+    substitution_events = match_events.loc[
+        match_events["type"] == "substitution",
+        ["match_id", "team_id", "player_id", "related_player_id", "minute"],
+    ]
+    substitution_events["duration"] = substitution_events["match_id"].map(
+        matches.set_index("match_id")["duration"]
+    )
+    substitution_events["related_player_minutes"] = (
+        substitution_events["duration"] - substitution_events["minute"]
+    )
+    substitution_events.drop(columns=["duration"], inplace=True)
+
+    related_substitution_events = substitution_events[
+        ["match_id", "team_id", "related_player_id", "related_player_minutes"]
+    ]
+    related_substitution_events.rename(columns={"related_player_id": "player_id"}, inplace=True)
+    player_substitution_events = substitution_events[["match_id", "team_id", "player_id", "minute"]]
+
+    events_count_per_player_match_and_type.sort_values(
+        ["player_id", "season_id", "match_date"], inplace=True, ascending=True
+    )
+    events_count_per_player_match_and_type.reset_index(drop=True, inplace=True)
+
+    # we make the group by player id and season, because I think that the previous match statistics
+    # cant be from another season, so I have the previous season statistics
+    events_count_per_player_match_and_type[
+        statistics_columns
+    ] = events_count_per_player_match_and_type.groupby(["player_id", "season_id"])[
+        statistics_columns
+    ].shift(
+        1
+    )
+    events_count_per_player_match_and_type.rename(
+        columns={
+            col: f"previous_match_{col.lower().replace(' ', '_')}" for col in statistics_columns
+        },
+        inplace=True,
+    )
+    events_count_per_player_match_and_type.fillna(0, inplace=True)
+    events_count_per_player_match_and_type.drop(columns=["match_date", "season_id"], inplace=True)
+
+    match_lineups = match_lineups.merge(
+        events_count_per_player_match_and_type, on=["match_id", "team_id", "player_id"], how="left"
+    ).drop_duplicates()
+    match_lineups.fillna(0, inplace=True)
+
+    # we merge de minutes of the substitutions after merge to lineups
+    # because could be players that not have events and they can be related in a substitution,
+    # so in the events_count_per_player_match_and_type we could not have the player there
+    match_lineups = match_lineups.merge(
+        player_substitution_events, on=["match_id", "team_id", "player_id"], how="left"
+    ).fillna(0)
+    match_lineups = match_lineups.merge(
+        related_substitution_events, on=["match_id", "team_id", "player_id"], how="left"
+    ).fillna(0)
+    match_lineups["minutes_played"] = (
+        match_lineups["minute"] + match_lineups["related_player_minutes"]
+    )
+    match_lineups.drop(columns=["minute", "related_player_minutes"], inplace=True)
+
+    # now we will get the players who were not in bench to set the minutes played,
+    # if they have played and there's no substitution event of them, we suppose
+    # that they have played all the match, so we set the duration of the match as minutes played
+    non_bench_players = (match_lineups["type"] != "bench") & (match_lineups["minutes_played"] == 0)
+    match_lineups.loc[non_bench_players, "minutes_played"] = match_lineups.loc[
+        non_bench_players, "duration"
+    ]
+    match_lineups.drop(columns=["duration"], inplace=True)
+
+    players_from_home_matches = match_lineups[
+        match_lineups["team_id"].isin(matches["team_id_home"].unique())
+    ]
+    home_matches_lineup = (
+        players_from_home_matches.groupby(["match_id", "team_id"])
+        .apply(lambda row: row.to_dict("records"))
+        .reset_index()
+        .rename(columns={0: "team_home_lineup", "team_id": "team_id_home"})
     )
 
-    # now we get the players that have substitutions to get the duration that they played
-    match_players_with_substitutions = events_count_per_player_match_and_type.loc[
-        ~events_count_per_player_match_and_type["substitution"].isna(), ["match_id", "player_id"]
+    players_from_away_matches = match_lineups[
+        match_lineups["team_id"].isin(matches["team_id_away"].unique())
     ]
-    substitutions = match_events.loc[
-        (match_events["match_id"] == match_players_with_substitutions["match_id"])
-        & (match_events["player_id"] == match_players_with_substitutions["player_id"]),
-        ["match_id", "player_id", "minute"],
-    ]
+    away_matches_lineup = (
+        players_from_away_matches.groupby(["match_id", "team_id"])
+        .apply(lambda row: row.to_dict("records"))
+        .reset_index()
+        .rename(columns={0: "team_away_lineup", "team_id": "team_id_away"})
+    )
 
-    return substitutions
+    matches = matches.merge(home_matches_lineup, on=["match_id", "team_id_home"], how="left")
+    matches = matches.merge(away_matches_lineup, on=["match_id", "team_id_away"], how="left")
+    matches.drop(columns=["lineups"], inplace=True)
+
+    return matches
 
 
 def transform_matches_data(
@@ -169,8 +277,7 @@ def transform_matches_data(
         inplace=True,
     )
     clean_data_matches = clean_data_matches.merge(match_scores, on="match_id")
-
-    transform_lineups(clean_data_matches, match_events)
+    clean_data_matches = transform_lineups(clean_data_matches, match_events, types)
 
     clean_data_home_matches = (
         clean_data_matches.groupby(["season_id", "league_id", "team_id_home"])

@@ -51,10 +51,11 @@ def _transform_season_data(transformed_data: pd.DataFrame, seasons: pd.DataFrame
     # we create an aux index to be able to get the teams by seasons
     # so if we have 2 seasons, we will have 2 rows for each team
     transformed_data.loc[:, "aux_index"] = 1
-    seasons.loc[:, "aux_index"] = 1
+    seasons_ = seasons.copy(deep=True)
+    seasons_.loc[:, "aux_index"] = 1
 
     transformed_data = transformed_data.merge(
-        seasons[["aux_index", "season", "season_id"]], on="aux_index"
+        seasons_[["aux_index", "season", "season_id"]], on="aux_index"
     )
     transformed_data.drop(columns="aux_index", inplace=True)
 
@@ -69,6 +70,7 @@ def _transform_league_data(transformed_data: pd.DataFrame, league: pd.Series):
 
 
 def transform(raw_data: dict[str, pd.DataFrame]) -> pd.DataFrame:
+    pd.options.mode.chained_assignment = None
     transformed_data = pd.DataFrame()
 
     seasons = raw_data[RAW_DATA_SEASONS].rename(columns={"id": "season_id", "name": "season"})
