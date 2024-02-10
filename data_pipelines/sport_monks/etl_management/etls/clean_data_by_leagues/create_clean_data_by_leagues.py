@@ -26,43 +26,25 @@ from sport_monks.etl_management.etls.clean_data_by_leagues.transformations.match
 from sport_monks.etl_management.etls.clean_data_by_leagues.transformations.player_data import (
     transform_players_data,
 )
+from sport_monks.etl_management.etls.clean_data_by_leagues.transformations.seasons_data import (
+    transform_season_data,
+)
+from sport_monks.etl_management.etls.clean_data_by_leagues.transformations.teams_data import (
+    transform_team_data,
+)
 
 
-def _transform_team_data(transformed_data: pd.DataFrame, teams: pd.DataFrame):
+def _transform_league_data(transformed_data: pd.DataFrame, league: pd.Series):
     """
-    Method to transform team data
+    Method to transform league data
 
     Parameters
     ----------
     transformed_data: pd.DataFrame
-        transformed data
-    teams: pd.DataFrame
-        teams data
+        clean data
+    league: pd.Series
+        league data
     """
-    teams.rename(columns={"id": "team_id"}, inplace=True)
-
-    transformed_data["team"] = teams["name"]
-    transformed_data["team_id"] = teams["team_id"]
-
-    return transformed_data
-
-
-def _transform_season_data(transformed_data: pd.DataFrame, seasons: pd.DataFrame):
-    # we create an aux index to be able to get the teams by seasons
-    # so if we have 2 seasons, we will have 2 rows for each team
-    transformed_data.loc[:, "aux_index"] = 1
-    seasons_ = seasons.copy(deep=True)
-    seasons_.loc[:, "aux_index"] = 1
-
-    transformed_data = transformed_data.merge(
-        seasons_[["aux_index", "season", "season_id"]], on="aux_index"
-    )
-    transformed_data.drop(columns="aux_index", inplace=True)
-
-    return transformed_data
-
-
-def _transform_league_data(transformed_data: pd.DataFrame, league: pd.Series):
     transformed_data["league"] = league["name"]
     transformed_data["league_id"] = league["id"]
 
@@ -70,6 +52,19 @@ def _transform_league_data(transformed_data: pd.DataFrame, league: pd.Series):
 
 
 def transform(raw_data: dict[str, pd.DataFrame]) -> pd.DataFrame:
+    """
+    Method to transform raw data
+
+    Parameters
+    ----------
+    raw_data: dict[str, pd.DataFrame]
+        raw data
+
+    Returns
+    -------
+    pd.DataFrame
+        clean data by leagues
+    """
     pd.options.mode.chained_assignment = None
     transformed_data = pd.DataFrame()
 
@@ -82,8 +77,8 @@ def transform(raw_data: dict[str, pd.DataFrame]) -> pd.DataFrame:
     league = raw_data[RAW_DATA_LEAGUES].iloc[0]
     league_seasons = seasons[seasons["league_id"] == league["id"]]
 
-    transformed_data = _transform_team_data(transformed_data, teams)
-    transformed_data = _transform_season_data(transformed_data, league_seasons)
+    transformed_data = transform_team_data(transformed_data, teams)
+    transformed_data = transform_season_data(transformed_data, league_seasons)
     transformed_data = transform_players_data(
         transformed_data, players, player_statistics, teams, seasons, league_seasons, matches
     )
@@ -129,6 +124,14 @@ def get_leagues() -> list[League]:
 
 
 def get_extractors_configuration(league: League):
+    """
+    Method to get extractors configuration
+
+    Parameters
+    ----------
+    league: League
+        league where we want to filter the data
+    """
     return [
         ExtractorConfig(
             RAW_DATA_MATCHES,

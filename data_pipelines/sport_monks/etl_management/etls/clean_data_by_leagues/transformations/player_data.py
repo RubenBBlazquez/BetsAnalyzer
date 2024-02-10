@@ -10,6 +10,18 @@ def transform_player_statistics(
     players: pd.DataFrame,
     seasons: pd.DataFrame,
 ):
+    """
+    Method to transform the player statistics data
+
+    Parameters
+    ----------
+    player_statistics: pd.DataFrame
+        player statistics data
+    players: pd.DataFrame
+        players data
+    seasons: pd.DataFrame
+        seasons data
+    """
     player_statistics = player_statistics[
         player_statistics["player_id"].isin(players.player_id.unique())
     ]
