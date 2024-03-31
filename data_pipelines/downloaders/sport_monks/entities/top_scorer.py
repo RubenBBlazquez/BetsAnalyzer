@@ -4,7 +4,8 @@ from typing import Optional, Type
 import attr
 from common.extractors.base import ExtractorConfig
 from common.extractors.mongo_db import MongoDBExtractor
-from downloaders.sport_monks.entities.entity_base import DownloaderEntityBase, SportMonksEntityBase
+from common.utils import EntityWrapper
+from downloaders.sport_monks.entities.entity_base import SportMonksDownloaderEntityBase
 from downloaders.sport_monks.sport_monks_client import SportMonksEndpoints
 
 RAW_DATA_SEASONS = f"raw_data_{SportMonksEndpoints.SEASONS.value}"
@@ -43,7 +44,7 @@ class TopScorerPlayer:
 
 
 @attr.s(auto_attribs=True)
-class TopScorer(SportMonksEntityBase):
+class TopScorer(EntityWrapper):
     """
     Entity that represents a player in sportmonks API
     """
@@ -59,13 +60,13 @@ class TopScorer(SportMonksEntityBase):
     type: TopScorerType
 
 
-class TopScorersDownloader(DownloaderEntityBase):
+class TopScorersSportMonksDownloader(SportMonksDownloaderEntityBase):
     """
     Entity that represents the information to create a top scorers downloader dag
     """
 
     @property
-    def endpoint_entity_wrapper(self) -> Type[SportMonksEntityBase]:
+    def endpoint_entity_wrapper(self) -> Type[EntityWrapper]:
         return TopScorer
 
     @property

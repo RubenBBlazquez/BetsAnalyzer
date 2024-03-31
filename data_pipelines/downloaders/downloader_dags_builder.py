@@ -5,7 +5,8 @@ import attr
 import pandas as pd
 from airflow.models.dag import DAG
 from airflow.operators.python import PythonOperator
-from downloaders.sport_monks.entities.entity_base import DownloaderEntityBase
+from common.writers.mongo_db import MongoDBWriter
+from downloaders.sport_monks.entities.entity_base import SportMonksDownloaderEntityBase
 from downloaders.sport_monks.factories import (
     DOWNLOADER_ENTITY_SWITCHER,
     RAW_DATA_COLLECTIONS_SWITCHER,
@@ -14,24 +15,26 @@ from downloaders.sport_monks.sport_monks_client import SportMonksClient, SportMo
 
 from data_pipelines.common.dag_builder import DagCollector, IDagBuilder
 from data_pipelines.common.writers.base import IWriter
-from data_pipelines.common.writers.mongo_db import MongoDBWriter
 
 
 @attr.s(auto_attribs=True)
-class SportMonksDownloadDagBuilder(IDagBuilder):
+class DownloaderDagBuilder(IDagBuilder):
     """
     Class for building DAG for downloading data from SportMonks API
 
     Attributes
     -----------
-    _entity: DownloaderEntityBase
+    _entity: SportMonksDownloaderEntityBase
         entity for downloading data
     _writer: IWriter
         writer for saving data
+    _downloader_tasks: list
+        list of downloader tasks
     """
 
-    _entity: DownloaderEntityBase
+    _entity: SportMonksDownloaderEntityBase
     _writer: IWriter
+    _downloader_tasks: list
 
     def _download_and_save_data(self):
         """
@@ -63,12 +66,10 @@ class SportMonksDownloadDagBuilder(IDagBuilder):
         return dag
 
 
-def build_sport_monks_dags() -> list[DAG]:
+def build_sports_monks_dags(dag_collector: DagCollector):
     """
-    Method to build DAGs for downloading data from SportMonks API
+    Method to build sport monks DAGs
     """
-    dag_collector = DagCollector()
-
     for endpoint in SportMonksEndpoints:
         entity = DOWNLOADER_ENTITY_SWITCHER[endpoint]
         raw_data_collection = RAW_DATA_COLLECTIONS_SWITCHER[endpoint]
@@ -78,6 +79,15 @@ def build_sport_monks_dags() -> list[DAG]:
             update_fields=entity.update_fields,
         )
 
-        dag_collector.add_builder(SportMonksDownloadDagBuilder(entity, writer))
+        dag_collector.add_builder(DownloaderDagBuilder(entity, writer, []))
+
+
+def build_downloader_dags() -> list[DAG]:
+    """
+    Method to build DAGs for downloading data from SportMonks API
+    """
+    dag_collector = DagCollector()
+
+    build_sports_monks_dags(dag_collector)
 
     return dag_collector.collect()

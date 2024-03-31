@@ -1,45 +1,20 @@
 from __future__ import annotations
 
-from copy import deepcopy
 from typing import Type
 
 import attr
-import cattrs
+from common.downloader_base import DownloaderEntityBase
+from common.utils import EntityWrapper
 
 
 @attr.s(auto_attribs=True)
-class SportMonksEntityBase:
-    def to_dict(self) -> dict:
-        """
-        method to convert entity to dict
-
-        Returns
-        -------
-        dict representation of entity
-        """
-        return attr.asdict(self)
-
-    @classmethod
-    def from_dict(cls, dict_: dict) -> SportMonksEntityBase:
-        """
-        method to cast dict to entity
-
-        Returns
-        -------
-        entity
-        """
-        converter = deepcopy(cattrs.global_converter)
-        return converter.structure(dict_, cls)
-
-
-@attr.s(auto_attribs=True)
-class DownloaderEntityBase:
+class SportMonksDownloaderEntityBase(DownloaderEntityBase):
     """
     Base Downloader Entity information
     """
 
     @property
-    def endpoint_entity_wrapper(self) -> Type[SportMonksEntityBase]:
+    def endpoint_entity_wrapper(self) -> Type[EntityWrapper]:
         """
         method to obtain the entity that wraps the endpoint data from sportMonks
 
@@ -95,14 +70,3 @@ class DownloaderEntityBase:
         list of includes
         """
         return []
-
-    @property
-    def update_fields(self) -> list[str]:
-        """
-        method to obtain the fields by which we are going to update/upsert the data
-
-        Returns
-        -------
-        list of update fields
-        """
-        return ["id"]

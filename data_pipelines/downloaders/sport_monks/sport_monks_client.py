@@ -4,7 +4,7 @@ from enum import Enum
 from typing import Any, Iterator
 
 import attr
-from downloaders.sport_monks.entities.entity_base import DownloaderEntityBase
+from downloaders.sport_monks.entities.entity_base import SportMonksDownloaderEntityBase
 
 from data_pipelines.common.api_client_base import ApiClientBase
 
@@ -37,7 +37,7 @@ class SportMonksClient(ApiClientBase):
         self.api_key = os.getenv("SPORT_MONKS_API_KEY", default="")
         self.api_url = os.getenv("SPORT_MONKS_BASE_URL", default="")
 
-    def get_data_in_batches(self, entity: DownloaderEntityBase) -> Iterator[Any]:
+    def get_data_in_batches(self, entity: SportMonksDownloaderEntityBase) -> Iterator[Any]:
         per_page = 50
         endpoints = entity.endpoints
 

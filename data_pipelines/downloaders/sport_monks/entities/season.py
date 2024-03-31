@@ -1,11 +1,12 @@
 from typing import Type
 
 import attr
-from downloaders.sport_monks.entities.entity_base import DownloaderEntityBase, SportMonksEntityBase
+from common.utils import EntityWrapper
+from downloaders.sport_monks.entities.entity_base import SportMonksDownloaderEntityBase
 
 
 @attr.s(auto_attribs=True)
-class Season(SportMonksEntityBase):
+class Season(EntityWrapper):
     """
     Entity that represents a season in sportmonks API
     """
@@ -24,13 +25,13 @@ class Season(SportMonksEntityBase):
     games_in_current_week: bool
 
 
-class SeasonsDownloader(DownloaderEntityBase):
+class SeasonsSportMonksDownloader(SportMonksDownloaderEntityBase):
     """
     Entity that represents the information to create a seasons downloader dag
     """
 
     @property
-    def endpoint_entity_wrapper(self) -> Type[SportMonksEntityBase]:
+    def endpoint_entity_wrapper(self) -> Type[EntityWrapper]:
         return Season
 
     @property

@@ -1,7 +1,8 @@
 from typing import Optional, Type
 
 import attr
-from downloaders.sport_monks.entities.entity_base import DownloaderEntityBase, SportMonksEntityBase
+from common.utils import EntityWrapper
+from downloaders.sport_monks.entities.entity_base import SportMonksDownloaderEntityBase
 
 
 @attr.s(auto_attribs=True)
@@ -57,7 +58,7 @@ class PlayerTeam:
 
 
 @attr.s(auto_attribs=True)
-class Player(SportMonksEntityBase):
+class Player(EntityWrapper):
     """
     Entity that represents a player in sportmonks API
     """
@@ -85,13 +86,13 @@ class Player(SportMonksEntityBase):
     position: Optional[PlayerPosition]
 
 
-class PlayersDownloader(DownloaderEntityBase):
+class PlayersSportMonksDownloader(SportMonksDownloaderEntityBase):
     """
     Entity that represents the information to create a players downloader dag
     """
 
     @property
-    def endpoint_entity_wrapper(self) -> Type[SportMonksEntityBase]:
+    def endpoint_entity_wrapper(self) -> Type[EntityWrapper]:
         return Player
 
     @property
@@ -103,7 +104,7 @@ class PlayersDownloader(DownloaderEntityBase):
         return ["players"]
 
 
-class SpainPlayersDownloader(PlayersDownloader):
+class SpainPlayersDownloader(PlayersSportMonksDownloader):
     """
     Entity that represents the information to create a spain players downloader dag
     """
@@ -117,7 +118,7 @@ class SpainPlayersDownloader(PlayersDownloader):
         return "spain_players"
 
 
-class EnglandPlayersDownloader(PlayersDownloader):
+class EnglandPlayersDownloader(PlayersSportMonksDownloader):
     """
     Entity that represents the information to create a england players downloader dag
     """
@@ -131,7 +132,7 @@ class EnglandPlayersDownloader(PlayersDownloader):
         return "england_players"
 
 
-class GermanyPlayersDownloader(PlayersDownloader):
+class GermanyPlayersDownloader(PlayersSportMonksDownloader):
     """
     Entity that represents the information to create a germany players downloader dag
     """

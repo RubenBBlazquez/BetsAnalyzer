@@ -1,6 +1,6 @@
 # *-* airflow DAG script *-*
 
-from downloaders.download_dag_builder import build_sport_monks_dags
+from downloaders.downloader_dags_builder import build_downloader_dags
 
-for dag in build_sport_monks_dags():
+for dag in build_downloader_dags():
     globals()[dag.dag_id] = dag

@@ -1,11 +1,12 @@
 from typing import Optional, Type
 
 import attr
-from downloaders.sport_monks.entities.entity_base import DownloaderEntityBase, SportMonksEntityBase
+from common.utils import EntityWrapper
+from downloaders.sport_monks.entities.entity_base import SportMonksDownloaderEntityBase
 
 
 @attr.s(auto_attribs=True)
-class League(SportMonksEntityBase):
+class League(EntityWrapper):
     """
     Entity that represents a league in sportmonks API
     """
@@ -24,13 +25,13 @@ class League(SportMonksEntityBase):
     has_jerseys: bool
 
 
-class LeaguesDownloader(DownloaderEntityBase):
+class LeaguesSportMonksDownloader(SportMonksDownloaderEntityBase):
     """
     Entity that represents the information to create a leagues downloader dag
     """
 
     @property
-    def endpoint_entity_wrapper(self) -> Type[SportMonksEntityBase]:
+    def endpoint_entity_wrapper(self) -> Type[EntityWrapper]:
         return League
 
     @property

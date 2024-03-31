@@ -1,11 +1,12 @@
 from typing import Optional, Type
 
 import attr
-from downloaders.sport_monks.entities.entity_base import DownloaderEntityBase, SportMonksEntityBase
+from common.utils import EntityWrapper
+from downloaders.sport_monks.entities.entity_base import SportMonksDownloaderEntityBase
 
 
 @attr.s(auto_attribs=True)
-class SportMonksType(SportMonksEntityBase):
+class SportMonksType(EntityWrapper):
     """
     Entity that represents a type in sportmonks API
     """
@@ -18,13 +19,13 @@ class SportMonksType(SportMonksEntityBase):
     stat_group: Optional[str]
 
 
-class SportMonksTypesDownloader(DownloaderEntityBase):
+class SportMonksTypesSportMonksDownloader(SportMonksDownloaderEntityBase):
     """
     Entity that represents the information to create a types downloader dag
     """
 
     @property
-    def endpoint_entity_wrapper(self) -> Type[SportMonksEntityBase]:
+    def endpoint_entity_wrapper(self) -> Type[EntityWrapper]:
         return SportMonksType
 
     @property

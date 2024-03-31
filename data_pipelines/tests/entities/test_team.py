@@ -1,4 +1,4 @@
-from downloaders import Team
+from downloaders.sport_monks.entities.team import Team
 
 team_players = [
     {

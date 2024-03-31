@@ -1,4 +1,4 @@
-from downloaders import Player
+from downloaders.sport_monks.entities.player import Player
 
 player_data = {
     "id": 1,

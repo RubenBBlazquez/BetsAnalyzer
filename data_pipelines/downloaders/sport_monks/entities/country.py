@@ -1,11 +1,12 @@
 from typing import Optional, Type
 
 import attr
-from downloaders.sport_monks.entities.entity_base import DownloaderEntityBase, SportMonksEntityBase
+from common.utils import EntityWrapper
+from downloaders.sport_monks.entities.entity_base import SportMonksDownloaderEntityBase
 
 
 @attr.s(auto_attribs=True)
-class Country(SportMonksEntityBase):
+class Country(EntityWrapper):
     """
     Entity that represents a country in sportmonks API
     """
@@ -23,13 +24,13 @@ class Country(SportMonksEntityBase):
     image_path: str
 
 
-class CountriesDownloader(DownloaderEntityBase):
+class CountriesSportMonksDownloader(SportMonksDownloaderEntityBase):
     """
     Entity that represents the information to create a countries downloader dag
     """
 
     @property
-    def endpoint_entity_wrapper(self) -> Type[SportMonksEntityBase]:
+    def endpoint_entity_wrapper(self) -> Type[EntityWrapper]:
         return Country
 
     @property

@@ -1,5 +1,5 @@
 import pandas as pd
-from etl_management.sport_monks.clean_data_by_leagues import transform_matches_data
+from etl_management.sport_monks.create_clean_data_by_leagues import transform_matches_data
 
 RAW_DATA_MATCHES = pd.DataFrame(
     [
@@ -171,6 +171,40 @@ RAW_DATA_MATCHES = pd.DataFrame(
                 },
             ],
             "weatherreport": None,
+            "events": [
+                {
+                    "period_id": 666240,
+                    "participant_id": 793,
+                    "type_id": 19,
+                    "section": "event",
+                    "player_id": 237,
+                    "related_player_id": 110226,
+                    "player_name": "Pablo Zabaleta",
+                    "related_player_name": "Hernán Pérez",
+                    "result": "assist",
+                    "info": None,
+                    "addition": None,
+                    "minute": 61,
+                    "extra_minute": None,
+                    "injured": None,
+                    "on_bench": False,
+                    "coach_id": None,
+                    "sub_type_id": None,
+                }
+            ],
+        }
+    ]
+)
+
+RAW_DATA_TYPES = pd.DataFrame(
+    [
+        {
+            "id": 7,
+            "name": "1st Assistant",
+            "code": "1st_assistant",
+            "developer_name": "REFEREE_TWO",
+            "model_type": "referee",
+            "stat_group": None,
         }
     ]
 )
@@ -269,7 +303,7 @@ def test_transform_matches_data():
         ]
     )
     result = transform_matches_data(
-        transformed_data, RAW_DATA_MATCHES, RAW_DATA_TEAMS, RAW_DATA_TEAMS
+        transformed_data, RAW_DATA_MATCHES, RAW_DATA_TEAMS, RAW_DATA_TYPES
     )
     expected = pd.DataFrame(
         [
