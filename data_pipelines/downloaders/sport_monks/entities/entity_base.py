@@ -58,7 +58,7 @@ class SportMonksDownloaderEntityBase(DownloaderEntityBase):
         if len(self.endpoints) == 0:
             raise NotImplementedError()
 
-        return self.endpoints[0].capitalize().replace("/", "_")
+        return f"SportMonks_{self.endpoints[0].capitalize().replace('/', '_')}"
 
     @property
     def includes(self) -> list[str]:

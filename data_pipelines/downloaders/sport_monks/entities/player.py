@@ -115,7 +115,7 @@ class SpainPlayersDownloader(PlayersSportMonksDownloader):
 
     @property
     def dag_name(self) -> str:
-        return "spain_players"
+        return "SportMonks_spain_players"
 
 
 class EnglandPlayersDownloader(PlayersSportMonksDownloader):
@@ -129,7 +129,7 @@ class EnglandPlayersDownloader(PlayersSportMonksDownloader):
 
     @property
     def dag_name(self) -> str:
-        return "england_players"
+        return "SportMonks_england_players"
 
 
 class GermanyPlayersDownloader(PlayersSportMonksDownloader):
@@ -143,4 +143,4 @@ class GermanyPlayersDownloader(PlayersSportMonksDownloader):
 
     @property
     def dag_name(self) -> str:
-        return "germany_players"
+        return "SportMonks_germany_players"

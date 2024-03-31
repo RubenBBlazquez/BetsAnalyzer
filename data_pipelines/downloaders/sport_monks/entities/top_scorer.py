@@ -75,7 +75,7 @@ class TopScorersSportMonksDownloader(SportMonksDownloaderEntityBase):
 
     @property
     def dag_name(self) -> str:
-        return "player_statistics_by_season"
+        return "SportMonks_player_statistics_by_season"
 
     @property
     def endpoints(self) -> list[str]:

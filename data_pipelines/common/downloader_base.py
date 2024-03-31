@@ -24,6 +24,13 @@ class DownloaderEntityBase:
         raise NotImplementedError()
 
     @property
+    def schedule(self) -> str | list[Dataset]:
+        """
+        method to obtain the schedule from a dag
+        """
+        return "@daily"
+
+    @property
     def update_fields(self) -> list[str]:
         """
         method to obtain the fields by which we are going to update/upsert the data
@@ -42,17 +49,23 @@ class Downloader:
 
     Attributes
     -----------
-    _name: str
-        name of the Downloader
-    _schedule: str | Dataset
-        schedule to run the Downloader
+    _entity: DownloaderEntityBase
+        downloader entity
     _writer: IWriter
         writer to insert data
+
     """
 
-    _name: str
-    _schedule: str | list[Dataset]
+    _entity: DownloaderEntityBase
     _writer: IWriter
+
+    @property
+    def entity(self):
+        return self._entity
+
+    @property
+    def writer(self):
+        return self._writer
 
     def get_downloader_tasks(self) -> list[Operator]:
         """
