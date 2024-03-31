@@ -6,8 +6,8 @@ from common.etl_base import ETL
 from common.extractors.base import ExtractorConfig
 from common.extractors.mongo_db import MongoDBExtractor
 from common.writers.mongo_db import MongoDBWriter
-from sport_monks.downloaders.entities.league import League
-from sport_monks.downloaders.factories import (
+from downloaders.sport_monks.entities.league import League
+from downloaders.sport_monks.factories import (
     DEFAULT_ENGLAND_COUNTRY_ID,
     DEFAULT_GERMANY_COUNTRY_ID,
     DEFAULT_SPAIN_COUNTRY_ID,
@@ -19,19 +19,11 @@ from sport_monks.downloaders.factories import (
     RAW_DATA_TOP_SCORERS,
     RAW_DATA_TYPES,
 )
-from sport_monks.downloaders.sport_monks_client import SportMonksEndpoints
-from sport_monks.etl_management.etls.clean_data_by_leagues.transformations.matches_data import (
-    transform_matches_data,
-)
-from sport_monks.etl_management.etls.clean_data_by_leagues.transformations.player_data import (
-    transform_players_data,
-)
-from sport_monks.etl_management.etls.clean_data_by_leagues.transformations.seasons_data import (
-    transform_season_data,
-)
-from sport_monks.etl_management.etls.clean_data_by_leagues.transformations.teams_data import (
-    transform_team_data,
-)
+from downloaders.sport_monks.sport_monks_client import SportMonksEndpoints
+from etl_management.sport_monks.transformations.matches_data import transform_matches_data
+from etl_management.sport_monks.transformations.player_data import transform_players_data
+from etl_management.sport_monks.transformations.seasons_data import transform_season_data
+from etl_management.sport_monks.transformations.teams_data import transform_team_data
 
 
 def _transform_league_data(transformed_data: pd.DataFrame, league: pd.Series):

@@ -4,12 +4,8 @@ from typing import Optional, Type
 import attr
 from common.extractors.base import ExtractorConfig
 from common.extractors.mongo_db import MongoDBExtractor
-from sport_monks.downloaders.sport_monks_client import SportMonksEndpoints
-
-from data_pipelines.sport_monks.downloaders.entities.entity_base import (
-    DownloaderEntityBase,
-    SportMonksEntityBase,
-)
+from downloaders.sport_monks.entities.entity_base import DownloaderEntityBase, SportMonksEntityBase
+from downloaders.sport_monks.sport_monks_client import SportMonksEndpoints
 
 RAW_DATA_SEASONS = f"raw_data_{SportMonksEndpoints.SEASONS.value}"
 

@@ -1,7 +1,7 @@
 from typing import Type
 
 import attr
-from sport_monks.downloaders.entities.entity_base import DownloaderEntityBase, SportMonksEntityBase
+from downloaders.sport_monks.entities.entity_base import DownloaderEntityBase, SportMonksEntityBase
 
 
 @attr.s(auto_attribs=True)

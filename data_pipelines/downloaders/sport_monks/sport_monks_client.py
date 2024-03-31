@@ -4,7 +4,7 @@ from enum import Enum
 from typing import Any, Iterator
 
 import attr
-from sport_monks.downloaders.entities.entity_base import DownloaderEntityBase
+from downloaders.sport_monks.entities.entity_base import DownloaderEntityBase
 
 from data_pipelines.common.api_client_base import ApiClientBase
 

@@ -3,8 +3,7 @@ import subprocess
 
 import pytest
 from common.db_client.mongo_db_client import MongoDBConnection
-from pymongo import MongoClient
-from sport_monks.downloaders.factories import (
+from downloaders.sport_monks.factories import (
     RAW_DATA_COUNTRIES,
     RAW_DATA_LEAGUES,
     RAW_DATA_MATCHES,
@@ -13,6 +12,7 @@ from sport_monks.downloaders.factories import (
     RAW_DATA_TEAMS,
     RAW_DATA_TYPES,
 )
+from pymongo import MongoClient
 
 DOCKER_COMPOSE_FILE = os.path.join(os.path.dirname(__file__), "docker-compose.yaml")
 

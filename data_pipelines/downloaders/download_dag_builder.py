@@ -5,12 +5,12 @@ import attr
 import pandas as pd
 from airflow.models.dag import DAG
 from airflow.operators.python import PythonOperator
-from sport_monks.downloaders.entities.entity_base import DownloaderEntityBase
-from sport_monks.downloaders.factories import (
+from downloaders.sport_monks.entities.entity_base import DownloaderEntityBase
+from downloaders.sport_monks.factories import (
     DOWNLOADER_ENTITY_SWITCHER,
     RAW_DATA_COLLECTIONS_SWITCHER,
 )
-from sport_monks.downloaders.sport_monks_client import SportMonksClient, SportMonksEndpoints
+from downloaders.sport_monks.sport_monks_client import SportMonksClient, SportMonksEndpoints
 
 from data_pipelines.common.dag_builder import DagCollector, IDagBuilder
 from data_pipelines.common.writers.base import IWriter
@@ -73,7 +73,7 @@ def build_sport_monks_dags() -> list[DAG]:
         entity = DOWNLOADER_ENTITY_SWITCHER[endpoint]
         raw_data_collection = RAW_DATA_COLLECTIONS_SWITCHER[endpoint]
         writer = MongoDBWriter(
-            os.getenv("PROJECT_DATABASE", "sport_monks"),
+            os.getenv("PROJECT_DATABASE", ""),
             raw_data_collection,
             update_fields=entity.update_fields,
         )

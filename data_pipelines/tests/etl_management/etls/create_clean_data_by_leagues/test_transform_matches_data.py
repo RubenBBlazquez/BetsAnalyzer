@@ -1,7 +1,5 @@
 import pandas as pd
-from sport_monks.etl_management.etls.clean_data_by_leagues.create_clean_data_by_leagues import (
-    transform_matches_data,
-)
+from etl_management.sport_monks.clean_data_by_leagues import transform_matches_data
 
 RAW_DATA_MATCHES = pd.DataFrame(
     [

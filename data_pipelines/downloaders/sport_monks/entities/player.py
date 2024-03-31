@@ -1,11 +1,7 @@
 from typing import Optional, Type
 
 import attr
-
-from data_pipelines.sport_monks.downloaders.entities.entity_base import (
-    DownloaderEntityBase,
-    SportMonksEntityBase,
-)
+from downloaders.sport_monks.entities.entity_base import DownloaderEntityBase, SportMonksEntityBase
 
 
 @attr.s(auto_attribs=True)

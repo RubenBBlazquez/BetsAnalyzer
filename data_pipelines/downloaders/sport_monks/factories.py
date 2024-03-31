@@ -1,17 +1,17 @@
-from sport_monks.downloaders.entities.country import CountriesDownloader
-from sport_monks.downloaders.entities.league import LeaguesDownloader
-from sport_monks.downloaders.entities.match import MatchesDownloader
-from sport_monks.downloaders.entities.player import (
+from downloaders.sport_monks.entities.country import CountriesDownloader
+from downloaders.sport_monks.entities.league import LeaguesDownloader
+from downloaders.sport_monks.entities.match import MatchesDownloader
+from downloaders.sport_monks.entities.player import (
     EnglandPlayersDownloader,
     GermanyPlayersDownloader,
     PlayersDownloader,
     SpainPlayersDownloader,
 )
-from sport_monks.downloaders.entities.season import SeasonsDownloader
-from sport_monks.downloaders.entities.sport_monks_type import SportMonksTypesDownloader
-from sport_monks.downloaders.entities.team import TeamsDownloader
-from sport_monks.downloaders.entities.top_scorer import TopScorersDownloader
-from sport_monks.downloaders.sport_monks_client import SportMonksEndpoints
+from downloaders.sport_monks.entities.season import SeasonsDownloader
+from downloaders.sport_monks.entities.sport_monks_type import SportMonksTypesDownloader
+from downloaders.sport_monks.entities.team import TeamsDownloader
+from downloaders.sport_monks.entities.top_scorer import TopScorersDownloader
+from downloaders.sport_monks.sport_monks_client import SportMonksEndpoints
 
 DEFAULT_ENGLAND_COUNTRY_ID = 462
 DEFAULT_GERMANY_COUNTRY_ID = 11
