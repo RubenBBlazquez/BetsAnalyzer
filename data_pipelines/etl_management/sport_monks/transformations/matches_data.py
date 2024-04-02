@@ -1,3 +1,5 @@
+from itertools import chain
+
 import pandas as pd
 
 
@@ -13,8 +15,8 @@ def transform_match_scores(matches: pd.DataFrame, teams: pd.DataFrame):
         teams data
     """
     match_scores = matches[["match_id", "scores"]]
-    scores = match_scores["scores"].apply(pd.DataFrame).to_list()
-    scores = pd.concat(scores).reset_index(drop=True).drop(columns=["id", "type_id"])
+    scores = pd.DataFrame(chain.from_iterable(match_scores["scores"].to_list()))
+    scores = scores.drop(columns=["id", "type_id"])
     match_scores = match_scores.merge(scores, left_on="match_id", right_on="fixture_id")
     match_scores.drop(columns=["scores", "fixture_id"], inplace=True)
     match_scores[["goals", "participant"]] = match_scores["score"].apply(pd.Series)
@@ -104,7 +106,7 @@ def transform_lineups(matches: pd.DataFrame, match_events: pd.DataFrame, types: 
     types: pd.DataFrame
         types data
     """
-    match_lineups = pd.concat(matches["lineups"].apply(pd.DataFrame).to_list())
+    match_lineups = pd.DataFrame(chain.from_iterable(matches["lineups"].to_list()))
     match_lineups = match_lineups[["fixture_id", "team_id", "player_id", "player_name", "type_id"]]
     match_lineups = match_lineups.merge(types[["id", "code"]], left_on="type_id", right_on="id")
     match_lineups.drop(columns=["id"], inplace=True)

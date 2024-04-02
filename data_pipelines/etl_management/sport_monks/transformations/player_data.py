@@ -1,5 +1,6 @@
 import logging
 from datetime import datetime
+from itertools import chain
 
 import numpy as np
 import pandas as pd
@@ -89,8 +90,8 @@ def _transform_matches_lineups(matches: pd.DataFrame, seasons: pd.DataFrame):
         The seasons data of one league
     """
     # now we get lineups from each match to append to the unique players of each team in each season
-    lineups = matches["lineups"].apply(pd.DataFrame).to_list()
-    lineups = pd.concat(lineups).reset_index(drop=True).drop(columns=["id"])
+    lineups = pd.DataFrame(chain.from_iterable(matches["lineups"].to_list()))
+    lineups.drop(columns=["id"], inplace=True)
     lineups = lineups.merge(
         matches[["season_id", "match_id"]], left_on="fixture_id", right_on="match_id"
     )
@@ -126,9 +127,8 @@ def transform_teams_where_players_have_been_playing(valid_teams: list[str], play
     players: pd.DataFrame
         players data
     """
-    players_by_team_and_season = pd.concat(
-        players["teams"].apply(pd.DataFrame).to_list()
-    ).reset_index(drop=True)
+
+    players_by_team_and_season = pd.DataFrame(chain.from_iterable(players["teams"].to_list()))
     players_by_team_and_season = players_by_team_and_season.loc[
         players_by_team_and_season["team_id"].isin(valid_teams),
         ["player_id", "team_id", "start", "end", "transfer_id"],
@@ -207,9 +207,8 @@ def transform_player_transfers(
     current_season: str
         current season of the league we are processing
     """
-    valid_player_transfers = pd.concat(players["transfers"].apply(pd.DataFrame).to_list())
+    valid_player_transfers = pd.DataFrame(chain.from_iterable(players["transfers"].to_list()))
     valid_player_transfers.rename(columns={"id": "transfer_id"}, inplace=True)
-    valid_player_transfers.reset_index(drop=True, inplace=True)
     valid_player_transfers = valid_player_transfers[
         (valid_player_transfers["date"] != "None")
         & (valid_player_transfers["completed"])
@@ -267,9 +266,7 @@ def transform_players_data(
     players["age"] = (datetime.now() - pd.to_datetime(players["date_of_birth"])).dt.days // 365
     valid_teams = teams["team_id"].unique()
 
-    current_season_players = pd.concat(teams["players"].apply(pd.DataFrame).to_list()).reset_index(
-        drop=True
-    )
+    current_season_players = pd.DataFrame(chain.from_iterable(teams["players"].to_list()))
     current_season_players = current_season_players[["player_id", "team_id", "transfer_id"]]
     current_season_players["season"] = current_season
 
