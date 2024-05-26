@@ -47,7 +47,7 @@ class Downloader:
     """
     Base Downloader Entity information
 
-    Attributes
+    Attributes:
     -----------
     _entity: DownloaderEntityBase
         downloader entity
