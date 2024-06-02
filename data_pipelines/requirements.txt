@@ -5,7 +5,6 @@ attrs==23.1.0
 cattrs==23.2.3
 requests==2.31.0
 python-dotenv==1.0.0
-apache-airflow==2.8.0
 pymongo==4.6.1
 web_pdb==1.6.2
 pandas==1.5.3

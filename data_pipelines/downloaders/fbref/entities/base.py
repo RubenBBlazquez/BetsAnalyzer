@@ -13,8 +13,7 @@ class FBRefDownloaderEntityBase(DownloaderEntityBase):
             "You must implement the dag_name property in your FBRefEntityBase subclass"
         )
 
-    @property
-    def steps_generator(self) -> type[SeleniumStepsGenerator]:
+    def get_steps_generator(self) -> SeleniumStepsGenerator:
         raise NotImplementedError(
             "You must implement the steps_generator property in your FBRefEntityBase subclass"
         )

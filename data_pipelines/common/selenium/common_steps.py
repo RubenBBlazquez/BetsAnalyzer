@@ -1,3 +1,6 @@
+import logging
+from typing import Optional
+
 from attrs import define
 from common.selenium.selenium_client import SeleniumStep
 from selenium import webdriver
@@ -11,14 +14,14 @@ class ClickStep(SeleniumStep):
 
     Attributes
     ----------
-    selector: str
-        selector to find the element
     by: By
         method to find the element
+    selector: str
+        selector to find the element
     """
 
-    selector: str
     by: By
+    selector: str
 
     def execute(self, driver: webdriver.Remote) -> webdriver.Remote:
         element = driver.find_element(self.by, self.selector)
@@ -65,8 +68,15 @@ class GoToStep(SeleniumStep):
     """
 
     url: str
+    by: By = By.TAG_NAME
+    anchor_selector: Optional[str] = None
 
     def execute(self, driver: webdriver.Remote) -> webdriver.Remote:
+        if self.anchor_selector:
+            element = driver.find_element(self.by, self.anchor_selector)
+            self.url = element.get_attribute("href")
+
+        logging.info(f"Going to {self.url}")
         driver.get(self.url)
 
         return driver

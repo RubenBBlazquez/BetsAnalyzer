@@ -89,10 +89,10 @@ class SeleniumClient:
         steps = self.steps_generator.generate_steps(driver)
 
         for step in steps:
-            if isinstance(step, DownloaderSeleniumStep):
-                result = pd.concat([result, step.execute(driver)], ignore_index=True)
-                continue
+            result_step = self._execute_step(step, driver)
 
-            self._execute_step(step, driver)
+            if isinstance(result_step, pd.DataFrame):
+                result = pd.concat([result, result_step], ignore_index=True)
+                continue
 
         return result.reset_index(drop=True)

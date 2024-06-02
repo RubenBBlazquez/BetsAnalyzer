@@ -1,4 +1,5 @@
 import os
+from functools import cached_property
 from typing import Optional, Type
 
 import attr
@@ -77,7 +78,7 @@ class TopScorersSportMonksDownloader(SportMonksDownloaderEntityBase):
     def dag_name(self) -> str:
         return "SportMonks_player_statistics_by_season"
 
-    @property
+    @cached_property
     def endpoints(self) -> list[str]:
         database_name = os.getenv("PROJECT_DATABASE", "sport_monks")
         seasons = MongoDBExtractor([ExtractorConfig(RAW_DATA_SEASONS)], database_name).extract()[

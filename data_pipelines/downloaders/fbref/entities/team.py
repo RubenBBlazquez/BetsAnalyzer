@@ -6,14 +6,14 @@ from downloaders.fbref.specialized_selenium_steps.team_stats import (
 
 
 @define(auto_attribs=True)
-class TeamStatsFBRef(FBRefDownloaderEntityBase):
+class TeamStatsPerSeasonFBRef(FBRefDownloaderEntityBase):
     """
     Entity that represents the information to create a team stats downloader dag from fbref page
     """
 
     @property
     def dag_name(self) -> str:
-        return "FBRef_Team_Stats_from_all_seasons"
+        return "FBRef_Team_Stats_per_season"
 
     @property
     def schedule(self) -> str:
@@ -24,5 +24,5 @@ class TeamStatsFBRef(FBRefDownloaderEntityBase):
         return ["season", "team_name"]
 
     @property
-    def steps_generator(self) -> type[TeamStatsDownloaderStepsGenerator]:
-        return TeamStatsDownloaderStepsGenerator
+    def steps_generator(self) -> TeamStatsDownloaderStepsGenerator:
+        return TeamStatsDownloaderStepsGenerator()

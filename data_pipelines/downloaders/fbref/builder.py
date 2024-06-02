@@ -23,7 +23,7 @@ class FBRefDownloader(Downloader):
         if not isinstance(self._entity, FBRefDownloaderEntityBase):
             raise ValueError("FBRef Downloader entity must be an instance of FBRefEntityBase")
 
-        selenium_client = SeleniumClient(self.entity.steps_generator())
+        selenium_client = SeleniumClient(self.entity.steps_generator)
         result = selenium_client.execute()
         self.writer.write(result)
 
