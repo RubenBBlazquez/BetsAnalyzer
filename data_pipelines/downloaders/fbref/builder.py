@@ -16,6 +16,12 @@ class FBRefDownloader(Downloader):
     Class for downloading data from fbref page
     """
 
+    def _generate_selenium_steps(self):
+        """
+        Method to generate selenium steps
+        """
+        return self.entity.steps_generator.generate_steps()
+
     def _download_and_save_data(self):
         """
         Method to download and save data from sport_monks api
@@ -33,9 +39,14 @@ class FBRefDownloader(Downloader):
         """
         return [
             PythonOperator(
+                python_callable=self._generate_selenium_steps,
+                task_id="get_selenium_steps_task_mapping",
+                do_xcom_push=True,
+            ),
+            PythonOperator(
                 python_callable=self._download_and_save_data,
                 task_id="download_and_save_data",
-            )
+            ),
         ]
 
 

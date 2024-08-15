@@ -46,7 +46,7 @@ class TeamStatsDownloaderStepsGenerator(SeleniumStepsGenerator):
         "2023-2024",
     ]
 
-    def generate_steps(self, driver: webdriver.Remote) -> list[SeleniumStep]:
+    def generate_steps(self) -> list[SeleniumStep]:
         steps = []
 
         for season in self.seasons:

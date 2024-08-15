@@ -14,6 +14,8 @@ class MongoDBExtractor(BaseExtractor):
 
     Attributes
     -----------
+    _extractors_config: list[ExtractorConfig]
+        configuration for extractors
     _database_name: str
         database where we are going to extract data
     """

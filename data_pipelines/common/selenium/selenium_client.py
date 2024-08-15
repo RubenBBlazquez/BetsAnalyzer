@@ -33,7 +33,7 @@ class SeleniumStepsGenerator(ABC):
     """
 
     @abstractmethod
-    def generate_steps(self, driver: webdriver.Remote) -> list[SeleniumStep]:
+    def generate_steps(self) -> list[SeleniumStep]:
         raise NotImplementedError("Method generate_steps not implemented")
 
 
@@ -44,13 +44,13 @@ class SeleniumClient:
 
     Attributes:
     -----------
-    steps: SeleniumStepsGenerator
-        Generator of steps
+    steps: list[SeleniumStep]
+        list of steps to be executed
     retries_per_step: int = 2
         Number of retries for each step
     """
 
-    steps_generator: SeleniumStepsGenerator
+    steps: list[SeleniumStep]
     retries_per_step: int = 2
 
     def _execute_step(
@@ -86,9 +86,8 @@ class SeleniumClient:
             command_executor=os.getenv("SELENIUM_HUB_SERVER"), options=options
         )
         result = pd.DataFrame()
-        steps = self.steps_generator.generate_steps(driver)
 
-        for step in steps:
+        for step in self.steps:
             result_step = self._execute_step(step, driver)
 
             if isinstance(result_step, pd.DataFrame):
