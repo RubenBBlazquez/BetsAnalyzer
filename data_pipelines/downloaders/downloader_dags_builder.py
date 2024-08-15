@@ -18,6 +18,7 @@ def build_downloader_dag(downloader: Downloader) -> DAG:
         dag_id=f"Downloader_{entity.dag_name}",
         schedule=entity.schedule,
         start_date=datetime(today.year, today.month, today.day),
+        catchup=False,
     )
 
     for task in downloader.get_downloader_tasks():
