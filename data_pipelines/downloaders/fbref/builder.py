@@ -13,18 +13,19 @@ from downloaders.fbref.factories import DOWNLOADER_ENTITY_SWITCHER, RAW_DATA_COL
 @attr.s(auto_attribs=True)
 class FBRefDownloader(Downloader):
     """
-    Class for downloading data from fbref page
+    Class for downloading data from the fbref page.
+    This class implements the downloading logic for fbref data.
     """
 
     def _generate_selenium_steps(self):
         """
-        Method to generate selenium steps
+        Method to generate selenium steps for data extraction.
         """
         return self.entity.steps_generator.generate_steps()
 
     def _download_and_save_data(self):
         """
-        Method to download and save data from sport_monks api
+        Method to download and save data from the fbref API.
         """
         if not isinstance(self._entity, FBRefDownloaderEntityBase):
             raise ValueError("FBRef Downloader entity must be an instance of FBRefEntityBase")
@@ -35,7 +36,12 @@ class FBRefDownloader(Downloader):
 
     def get_downloader_tasks(self) -> list[Operator]:
         """
-        method to get downloader tasks
+        Method to get downloader tasks for Airflow.
+
+        Returns
+        -------
+        list[Operator]
+            List of Airflow operators for downloading tasks.
         """
         return [
             PythonOperator(
@@ -52,7 +58,12 @@ class FBRefDownloader(Downloader):
 
 def get_fb_ref_downloaders():
     """
-    Method to get fb_ref downloaders
+    Method to get fb_ref downloaders.
+
+    Yields
+    ------
+    FBRefDownloader
+        Instances of FBRefDownloader for each downloader entity.
     """
     for downloader_entity in DOWNLOADER_ENTITY_SWITCHER.keys():
         entity = DOWNLOADER_ENTITY_SWITCHER[downloader_entity]

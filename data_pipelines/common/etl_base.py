@@ -10,20 +10,20 @@ from common.writers.base import IWriter
 @attr.s(auto_attribs=True)
 class ETL:
     """
-    Base ETL Entity information
+    Base ETL Entity information.
 
     Attributes
     -----------
     name: str
-        name of the ETL
+        Name of the ETL.
     schedule: str | Dataset
-        schedule to run the ETL
+        Schedule to run the ETL.
     _writer: IWriter
-        writer to insert data
+        Writer to insert data.
     _extractor: BaseExtractor
-        extractors to obtain data from a service
+        Extractor to obtain data from a service.
     _transform: callable
-        function to transform data
+        Function to transform data.
     """
 
     name: str
@@ -34,18 +34,33 @@ class ETL:
 
     def extract(self) -> dict[str, pd.DataFrame]:
         """
-        method to extract data
+        Method to extract data.
         """
         return self._extractor.extract()
 
     def transform(self, raw_data: dict[str, pd.DataFrame]) -> pd.DataFrame:
         """
-        method to transform data
+        Method to transform data.
+
+        Parameters
+        ----------
+        raw_data: dict[str, pd.DataFrame]
+            Raw data extracted from the source.
+
+        Returns
+        -------
+        pd.DataFrame
+            Transformed data.
         """
         return self._transform(raw_data)
 
     def load(self, information: pd.DataFrame) -> None:
         """
-        method to load data
+        Method to load data.
+
+        Parameters
+        ----------
+        information: pd.DataFrame
+            Data to be loaded.
         """
         self._writer.write(information)

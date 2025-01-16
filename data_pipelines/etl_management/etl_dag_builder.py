@@ -8,13 +8,12 @@ from etl_management.sport_monks.create_clean_data_by_leagues import etl_clean_da
 
 def build_etl_task(etl: ETL) -> None:
     """
-    Method to execute ETL
+    Method to execute ETL.
 
     Parameters
     ----------
     etl: ETL
-        ETL entity
-
+        ETL entity to execute.
     """
     raw_data = etl.extract()
     transformed_data = etl.transform(raw_data)
@@ -23,13 +22,17 @@ def build_etl_task(etl: ETL) -> None:
 
 def build_etl_dag(etl: ETL) -> DAG:
     """
-    Method to build a DAG for an ETL
+    Method to build a DAG for an ETL.
 
     Parameters
     ----------
     etl: ETL
-        ETL entity
+        ETL entity to build the DAG for.
 
+    Returns
+    -------
+    DAG
+        The constructed DAG for the ETL process.
     """
     today = datetime.today()
     dag = DAG(
@@ -50,7 +53,12 @@ def build_etl_dag(etl: ETL) -> DAG:
 
 def build_etl_dags() -> list[DAG]:
     """
-    Method to build ETl Dags
+    Method to build ETL DAGs.
+
+    Returns
+    -------
+    list[DAG]
+        List of constructed DAGs for ETL processes.
     """
     etl_s = [
         *etl_clean_data_by_leagues(),

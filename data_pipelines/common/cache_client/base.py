@@ -4,33 +4,35 @@ import attr
 @attr.s(auto_attribs=True)
 class BaseCacheClient:
     """
-    Base Cache Client class
+    Base Cache Client class.
+    This class defines the interface for cache clients.
     """
 
     def get(self, key: str) -> str:
         """
-        method to get data from cache
+        Method to get data from cache.
 
         Parameters
         ----------
         key: str
-            key to get data
+            Key to get data from the cache.
 
         Returns
         -------
         data
+            The data retrieved from the cache.
         """
         raise NotImplementedError()
 
     def set(self, key: str, value: str):
         """
-        method to set data in cache
+        Method to set data in cache.
 
         Parameters
         ----------
         key: str
-            key to set data
+            Key to set data in the cache.
         value: str
-            value to set
+            Value to set in the cache.
         """
         raise NotImplementedError()

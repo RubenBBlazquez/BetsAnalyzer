@@ -8,24 +8,31 @@ import cattrs
 
 @attr.s(auto_attribs=True)
 class EntityWrapper:
+    """
+    Wrapper class for entities.
+    This class provides methods to convert entities to and from dictionaries.
+    """
+
     def to_dict(self) -> dict:
         """
-        method to convert entity to dict
+        Method to convert entity to dictionary.
 
         Returns
         -------
-        dict representation of entity
+        dict
+            Representation of the entity as a dictionary.
         """
         return attr.asdict(self)
 
     @classmethod
     def from_dict(cls, dict_: dict) -> EntityWrapper:
         """
-        method to cast dict to entity
+        Method to cast dictionary to entity.
 
         Returns
         -------
-        entity
+        EntityWrapper
+            The entity created from the dictionary.
         """
         converter = deepcopy(cattrs.global_converter)
         return converter.structure(dict_, cls)

@@ -4,6 +4,11 @@ from pymongo import MongoClient
 
 
 class MongoDBConnection:
+    """
+    MongoDB Connection class.
+    This class manages the connection to the MongoDB database.
+    """
+
     def __init__(self):
         user = os.getenv("MONGO_USER")
         password = os.getenv("MONGO_PASSWORD")
@@ -13,7 +18,7 @@ class MongoDBConnection:
         connection_uri = f"mongodb://{user}:{password}@{host}:{port}?authSource={auth_db}"
         self.db_conn = MongoClient(connection_uri)
 
-    # singleton
+    # Singleton pattern implementation
     _instance = None
 
     def __new__(cls, *args, **kw):

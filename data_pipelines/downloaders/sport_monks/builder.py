@@ -17,13 +17,13 @@ from downloaders.sport_monks.sport_monks_client import SportMonksClient, SportMo
 @attr.s(auto_attribs=True)
 class SportMonksDownloader(Downloader):
     """
-    Class for downloading data from sport monks api
-
+    Class for downloading data from the Sport Monks API.
+    This class implements the downloading logic for Sport Monks data.
     """
 
     def _download_and_save_data(self):
         """
-        Method to download and save data from sport_monks api
+        Method to download and save data from the Sport Monks API.
         """
         if not isinstance(self._entity, SportMonksDownloaderEntityBase):
             raise ValueError(
@@ -41,7 +41,12 @@ class SportMonksDownloader(Downloader):
 
     def get_downloader_tasks(self) -> list[Operator]:
         """
-        method to get downloader tasks
+        Method to get downloader tasks for Airflow.
+
+        Returns
+        -------
+        list[Operator]
+            List of Airflow operators for downloading tasks.
         """
         return [
             PythonOperator(
@@ -52,6 +57,14 @@ class SportMonksDownloader(Downloader):
 
 
 def get_sport_monks_downloaders():
+    """
+    Method to get Sport Monks downloaders.
+
+    Yields
+    ------
+    SportMonksDownloader
+        Instances of SportMonksDownloader for each endpoint.
+    """
     for endpoint in SportMonksEndpoints:
         entity = DOWNLOADER_ENTITY_SWITCHER[endpoint]
         raw_data_collection = RAW_DATA_COLLECTIONS_SWITCHER[endpoint]
