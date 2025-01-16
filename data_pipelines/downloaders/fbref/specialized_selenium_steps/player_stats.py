@@ -9,7 +9,7 @@ from common.selenium.selenium_client import (
     SeleniumStep,
     SeleniumStepsGenerator,
 )
-from common.selenium.utils import extract_stat
+from common.selenium.utils import get_stat
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 
@@ -82,14 +82,14 @@ class DownloadSeasonPlayerStatsStep(DownloaderSeleniumStep):
         """
         player_row = soup.find("tr", {"data-row": index})
 
-        player_name = extract_stat(player_row, "player", str, True)
-        team_name = extract_stat(player_row, "team", str, True)
-        goals = extract_stat(player_row, "goals", int)
-        assists = extract_stat(player_row, "assists", int)
-        yellow_cards = extract_stat(player_row, "cards_yellow", int)
-        red_cards = extract_stat(player_row, "cards_red", int)
-        goals_per_90 = extract_stat(player_row, "goals_per90", float)
-        assists_per_90 = extract_stat(player_row, "assists_per90", float)
+        player_name = get_stat(player_row, "player", str, True)
+        team_name = get_stat(player_row, "team", str, True)
+        goals = get_stat(player_row, "goals", int)
+        assists = get_stat(player_row, "assists", int)
+        yellow_cards = get_stat(player_row, "cards_yellow", int)
+        red_cards = get_stat(player_row, "cards_red", int)
+        goals_per_90 = get_stat(player_row, "goals_per90", float)
+        assists_per_90 = get_stat(player_row, "assists_per90", float)
 
         player_stats = PlayerStats(
             season=self.season,

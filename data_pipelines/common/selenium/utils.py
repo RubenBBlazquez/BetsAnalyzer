@@ -1,7 +1,4 @@
-from bs4 import BeautifulSoup
-
-
-def extract_stat(row, stat_name: str, cast_type, is_link=False):
+def get_stat(row, stat_name: str, cast_type, is_link=False):
     """
     Helper method to extract a stat from a row and cast it to the desired type.
     """

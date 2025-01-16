@@ -10,6 +10,7 @@ from common.selenium.selenium_client import (
     SeleniumStep,
     SeleniumStepsGenerator,
 )
+from common.selenium.utils import get_stat
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 
@@ -148,9 +149,9 @@ class DownloadSeasonTeamStatsStep(DownloaderSeleniumStep):
         """
         team_row = soup.find("tr", {"data-row": index})
 
-        finish_position = self.get_stat(team_row, "rank", int)
-        top_player_name = self.get_stat(team_row, "top_team_scorers", str, True)
-        top_player_score = self.get_stat(team_row, "top_team_scorers", int, True)
+        finish_position = get_stat(team_row, "rank", int)
+        top_player_name = get_stat(team_row, "top_team_scorers", str, True)
+        top_player_score = get_stat(team_row, "top_team_scorers", int, True)
 
         home_away_team_stats_rows = driver.find_element(By.ID, f"results{self.season}121_home_away")
         home_away_soup = BeautifulSoup(
@@ -158,7 +159,7 @@ class DownloadSeasonTeamStatsStep(DownloaderSeleniumStep):
         )
         home_away_row = home_away_soup.find("tr", {"data-row": index})
 
-        team_name = self.get_stat(home_away_row, "team", str, True)
+        team_name = get_stat(home_away_row, "team", str, True)
         home_stats = self.extract_home_away_stats(home_away_row)
 
         general_team_stats_rows = driver.find_element(By.ID, f"stats_squads_standard_for")
@@ -186,24 +187,24 @@ class DownloadSeasonTeamStatsStep(DownloaderSeleniumStep):
         Extracts home and away stats from the row and returns them as a dictionary.
         """
         return {
-            "home_games": self.get_stat(row, "home_games", int),
-            "home_wins": self.get_stat(row, "home_wins", int),
-            "home_draws": self.get_stat(row, "home_ties", int),
-            "home_losses": self.get_stat(row, "home_losses", int),
-            "home_goals_for": self.get_stat(row, "home_goals_for", int),
-            "home_goals_against": self.get_stat(row, "home_goals_against", int),
-            "home_goals_diff": self.get_stat(row, "home_goal_diff", int),
-            "home_points": self.get_stat(row, "home_points", int),
-            "home_points_avg": self.get_stat(row, "home_points_avg", float),
-            "away_games": self.get_stat(row, "away_games", int),
-            "away_wins": self.get_stat(row, "away_wins", int),
-            "away_draws": self.get_stat(row, "away_ties", int),
-            "away_losses": self.get_stat(row, "away_losses", int),
-            "away_goals_for": self.get_stat(row, "away_goals_for", int),
-            "away_goals_against": self.get_stat(row, "away_goals_against", int),
-            "away_goals_diff": self.get_stat(row, "away_goal_diff", int),
-            "away_points": self.get_stat(row, "away_points", int),
-            "away_points_avg": self.get_stat(row, "away_points_avg", float),
+            "home_games": get_stat(row, "home_games", int),
+            "home_wins": get_stat(row, "home_wins", int),
+            "home_draws": get_stat(row, "home_ties", int),
+            "home_losses": get_stat(row, "home_losses", int),
+            "home_goals_for": get_stat(row, "home_goals_for", int),
+            "home_goals_against": get_stat(row, "home_goals_against", int),
+            "home_goals_diff": get_stat(row, "home_goal_diff", int),
+            "home_points": get_stat(row, "home_points", int),
+            "home_points_avg": get_stat(row, "home_points_avg", float),
+            "away_games": get_stat(row, "away_games", int),
+            "away_wins": get_stat(row, "away_wins", int),
+            "away_draws": get_stat(row, "away_ties", int),
+            "away_losses": get_stat(row, "away_losses", int),
+            "away_goals_for": get_stat(row, "away_goals_for", int),
+            "away_goals_against": get_stat(row, "away_goals_against", int),
+            "away_goals_diff": get_stat(row, "away_goal_diff", int),
+            "away_points": get_stat(row, "away_points", int),
+            "away_points_avg": get_stat(row, "away_points_avg", float),
         }
 
     def extract_general_stats(self, row) -> dict:
@@ -211,29 +212,17 @@ class DownloadSeasonTeamStatsStep(DownloaderSeleniumStep):
         Extracts general stats from the row and returns them as a dictionary.
         """
         return {
-            "n_players_used": self.get_stat(row, "players_used", int),
-            "avg_age": self.get_stat(row, "avg_age", float),
-            "goals": self.get_stat(row, "goals", int),
-            "assists": self.get_stat(row, "assists", int),
-            "goals_plus_assists": self.get_stat(row, "goals_assists", int),
-            "yellow_cards": self.get_stat(row, "cards_yellow", int),
-            "red_cards": self.get_stat(row, "cards_red", int),
-            "goals_per_90": self.get_stat(row, "goals_per90", float),
-            "assists_per_90": self.get_stat(row, "assists_per90", float),
-            "goal_assists_per_90": self.get_stat(row, "goals_assists_per90", float),
-            "shots_on_target_pct": self.get_stat(row, "shots_on_target_pct", float) / 100,
-            "shots_total": self.get_stat(row, "shots", int),
-            "shots_on_target": self.get_stat(row, "shots_on_target", int),
+            "n_players_used": get_stat(row, "players_used", int),
+            "avg_age": get_stat(row, "avg_age", float),
+            "goals": get_stat(row, "goals", int),
+            "assists": get_stat(row, "assists", int),
+            "goals_plus_assists": get_stat(row, "goals_assists", int),
+            "yellow_cards": get_stat(row, "cards_yellow", int),
+            "red_cards": get_stat(row, "cards_red", int),
+            "goals_per_90": get_stat(row, "goals_per90", float),
+            "assists_per_90": get_stat(row, "assists_per90", float),
+            "goal_assists_per_90": get_stat(row, "goals_assists_per90", float),
+            "shots_on_target_pct": get_stat(row, "shots_on_target_pct", float) / 100,
+            "shots_total": get_stat(row, "shots", int),
+            "shots_on_target": get_stat(row, "shots_on_target", int),
         }
-
-    def get_stat(self, row, stat_name: str, cast_type, is_link=False):
-        """
-        Helper method to extract a stat from a row and cast it to the desired type.
-        """
-        try:
-            if is_link:
-                return row.select_one(f"td[data-stat='{stat_name}'] > a").text
-
-            return row.find("td", {"data-stat": stat_name}).text
-        except (AttributeError, ValueError):
-            return None if cast_type is str else cast_type()
