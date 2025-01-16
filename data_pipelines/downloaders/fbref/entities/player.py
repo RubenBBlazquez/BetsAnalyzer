@@ -1,3 +1,5 @@
+from typing import Type
+
 from airflow import Dataset
 from attrs import define
 from downloaders.fbref.entities.base import FBRefDownloaderEntityBase
@@ -32,7 +34,5 @@ class PlayerStatsPerSeasonFBRef(FBRefDownloaderEntityBase):
         return ["season", "team", "player"]
 
     @property
-    def steps_generator(self) -> PLayerStatsDownloaderStepsGenerator:
-        return PLayerStatsDownloaderStepsGenerator(
-            self._team_collection,
-        )
+    def steps_generator(self) -> Type[PLayerStatsDownloaderStepsGenerator]:
+        return PLayerStatsDownloaderStepsGenerator

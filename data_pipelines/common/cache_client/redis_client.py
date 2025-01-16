@@ -1,7 +1,9 @@
+import json
 import os
 from typing import Any
 
 import attr
+import pandas as pd
 from common.cache_client.base import BaseCacheClient
 from redis import Redis
 
@@ -29,8 +31,8 @@ class RedisCacheClient(BaseCacheClient):
     def __attrs_post_init__(self):
         self._client = Redis(host=self._host, port=self._port, db=self._db).client()
 
-    def get(self, key: str) -> str:
-        return self._client.get(key)
+    def get(self, key: str) -> pd.DataFrame:
+        return pd.DataFrame(json.loads(self._client.get(key)))
 
     def set(self, key: str, value: Any, timeout: int = 100000):
         self._client.set(key, value, ex=timeout)

@@ -1,11 +1,11 @@
 import logging
 import os
+from typing import Any
 
 import attr
 import pandas as pd
 from attrs import define
-from common.extractors.base import ExtractorConfig
-from common.extractors.mongo_db import MongoDBExtractor
+from common.cache_client.redis_client import RedisCacheClient
 from common.selenium.common_steps import GoToStep
 from common.selenium.parsing_methods import get_element_or_none
 from common.selenium.selenium_client import (
@@ -13,6 +13,7 @@ from common.selenium.selenium_client import (
     SeleniumStep,
     SeleniumStepsGenerator,
 )
+from downloaders.sport_monks.factories import RAW_DATA_COLLECTIONS_SWITCHER, RAW_DATA_SEASONS
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 
@@ -24,44 +25,12 @@ class PLayerStatsDownloaderStepsGenerator(SeleniumStepsGenerator):
 
     Attributes:
     -----------
-    teams_collection: str
-        Collection of the teams
+    _team_information: str
+        Information about the team which stats are going to be downloaded
     """
 
-    _teams_collection: str
+    _team_information: dict[str, Any]
     _db_project_name = os.getenv("PROJECT_DATABASE", "bets_analyzer")
-    _seasons: list[str] = [
-        "2000-2001",
-        "2001-2002",
-        "2002-2003",
-        "2003-2004",
-        "2004-2005",
-        "2005-2006",
-        "2006-2007",
-        "2007-2008",
-        "2008-2009",
-        "2009-2010",
-        "2010-2011",
-        "2011-2012",
-        "2012-2013",
-        "2013-2014",
-        "2014-2015",
-        "2015-2016",
-        "2016-2017",
-        "2017-2018",
-        "2018-2019",
-        "2019-2020",
-        "2020-2021",
-        "2021-2022",
-        "2022-2023",
-        "2023-2024",
-    ]
-
-    def _get_teams_from_season(self, season: str) -> pd.DataFrame:
-        return MongoDBExtractor(
-            [ExtractorConfig(self._teams_collection, query={"season": season})],
-            self._db_project_name,
-        ).extract()[self._teams_collection]
 
     @staticmethod
     def _generate_steps(season: str, team: str) -> list[SeleniumStep]:
@@ -79,22 +48,13 @@ class PLayerStatsDownloaderStepsGenerator(SeleniumStepsGenerator):
 
     def generate_steps(self) -> list[SeleniumStep]:
         steps = []
+        team_name = self._team_information["team_name"]
+        seasons = RedisCacheClient().get(RAW_DATA_COLLECTIONS_SWITCHER[RAW_DATA_SEASONS])
 
-        logging.info("::group:: Teams per seasons extraction logs")
+        logging.info(f"Generating Steps to get Player Stats for team {team_name}")
 
-        for season in self._seasons:
-            teams = self._get_teams_from_season(season)
-
-            if teams.empty:
-                logging.info("No teams found for season %s", season)
-                continue
-
-            season_teams = teams.team_name
-
-            for team in season_teams:
-                steps.extend(self._generate_steps(season, team))
-
-        logging.info("::endgroup::")
+        for season in seasons.name.str.replace("/", "-").stunique():
+            steps.extend(self._generate_steps(season, team_name))
 
         return steps
 

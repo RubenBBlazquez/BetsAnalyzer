@@ -7,6 +7,7 @@ from airflow.utils.dates import days_ago
 from common.cache_client.redis_client import RedisCacheClient
 from common.extractors.base import ExtractorConfig
 from common.extractors.mongo_db import MongoDBExtractor
+from downloaders.fbref.factories import RAW_DATA_COLLECTIONS_SWITCHER, TEAM_STATS_FB_REF_KEY
 
 with DAG(
     dag_id="download_and_save_in_cache",
@@ -20,6 +21,7 @@ with DAG(
             ExtractorConfig(collection="raw_data_teams"),
             ExtractorConfig(collection="raw_data_seasons"),
             ExtractorConfig(collection="raw_data_leagues"),
+            ExtractorConfig(collection=RAW_DATA_COLLECTIONS_SWITCHER[TEAM_STATS_FB_REF_KEY]),
         ]
         extractor = MongoDBExtractor(
             extractors_config, os.getenv("PROJECT_DATABASE", "bets_analyzer")

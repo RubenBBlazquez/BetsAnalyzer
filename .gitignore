@@ -156,3 +156,4 @@ cython_debug/
 
 airflow_config/
 mongo_volumes/
+.aider*
