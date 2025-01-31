@@ -8,7 +8,7 @@ from common.selenium.common_steps import GoToStep
 from common.selenium.selenium_client import (
     DownloaderSeleniumStep,
     SeleniumStep,
-    SeleniumStepsGenerator,
+    SeleniumStepsGenerator, NormalSeleniumStepException,
 )
 from common.selenium.utils import get_stat
 from selenium import webdriver
@@ -81,6 +81,9 @@ class TeamStats:
 
         return cls(**columns)
 
+    def to_dataframe(self):
+        return pd.DataFrame([self.__dict__])
+
 
 
 class TeamStatsDownloaderStepsGenerator(SeleniumStepsGenerator):
@@ -143,13 +146,17 @@ class DownloadSeasonTeamStatsStep(DownloaderSeleniumStep):
         logging.info(f"Downloading team stats for season {self.season}")
         result = []
 
-        all_team_stats_rows = driver.find_element(By.ID, f"results{self.season}121_overall")
+        try:
+            all_team_stats_rows = driver.find_element(By.ID, f"results{self.season}121_overall")
+        except:
+            raise NormalSeleniumStepException(f"Could not find the team stats for season {self.season}")
+
         soup = BeautifulSoup(all_team_stats_rows.get_attribute("outerHTML"), "html.parser")
         n_teams = len(soup.select("[data-row]"))
 
         for index in range(n_teams):
             team_stats = self.extract_team_stats(soup, driver, index)
-            result.append(pd.DataFrame([team_stats.__dict__]))
+            result.append(team_stats.to_dataframe())
 
         return pd.concat(result, ignore_index=True)
 

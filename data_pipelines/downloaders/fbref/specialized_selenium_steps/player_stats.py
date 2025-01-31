@@ -7,7 +7,7 @@ from common.selenium.common_steps import GoToStep
 from common.selenium.selenium_client import (
     DownloaderSeleniumStep,
     SeleniumStep,
-    SeleniumStepsGenerator,
+    SeleniumStepsGenerator, NormalSeleniumStepException,
 )
 from common.selenium.utils import get_stat
 from selenium import webdriver
@@ -66,7 +66,11 @@ class DownloadSeasonPlayerStatsStep(DownloaderSeleniumStep):
         logging.info(f"Downloading player stats for season {self.season}")
         result = []
 
-        all_player_stats_rows = driver.find_element(By.ID, f"results{self.season}121_overall")
+        try:
+            all_player_stats_rows = driver.find_element(By.ID, f"results{self.season}121_overall")
+        except Exception as e:
+            raise NormalSeleniumStepException(f"Could not find any player stats for season {self.season}")
+
         soup = BeautifulSoup(all_player_stats_rows.get_attribute("outerHTML"), "html.parser")
         n_players = len(soup.select("[data-row]"))
 

@@ -1,3 +1,4 @@
+import logging
 import os
 import time
 from abc import ABC, abstractmethod
@@ -6,6 +7,9 @@ import pandas as pd
 from attrs import define
 from selenium import webdriver
 
+
+class NormalSeleniumStepException(Exception):
+    pass
 
 class SeleniumStep(ABC):
     """
@@ -69,8 +73,12 @@ class SeleniumClient:
                 print(f"Error executing step: {e}")
                 print(f"Retries left: {retries}")
 
+                if retries == 0 and isinstance(e, NormalSeleniumStepException):
+                    return pd.DataFrame()
+
                 if retries == 0:
                     raise e
+
 
                 time.sleep(1)
 

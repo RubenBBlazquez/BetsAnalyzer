@@ -8,6 +8,9 @@ from pymongo import MongoClient, UpdateOne
 from data_pipelines.common.writers.base import IWriter
 
 
+class NoDataToWriteError(Exception):
+    pass
+
 @attr.s(auto_attribs=True)
 class MongoDBWriter(IWriter):
     """
@@ -49,6 +52,9 @@ class MongoDBWriter(IWriter):
             f"from {self._database_name} "
             f"to Mongodb: {entities.shape[0]}"
         )
+
+        if entities.empty:
+            raise NoDataToWriteError("there is no data to write")
 
         self.db.get_collection(self._collection).bulk_write(
             self._generate_update_fields_query(entities)
