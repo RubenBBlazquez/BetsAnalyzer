@@ -18,4 +18,4 @@ Urls
 
 **A tener en cuenta**:
 Para la generación de dags, lo que hace el scheduler de airflow es leer continuamente la carpeta dags de data_pipelines,
-y crear un enlace simbólico dentro de la máquina de airflow, puedes verlo en el script de airflow_dags_entrypoint.sh
+a traves de un enlace simbólico dentro de la máquina de airflow, puedes verlo en el script de airflow_dags_entrypoint.sh
