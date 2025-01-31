@@ -1,3 +1,5 @@
+from typing import Type
+
 from attrs import define
 from downloaders.fbref.entities.base import FBRefDownloaderEntityBase
 from downloaders.fbref.specialized_selenium_steps.team_stats import (
@@ -24,5 +26,5 @@ class TeamStatsPerSeasonFBRef(FBRefDownloaderEntityBase):
         return ["season", "team_name"]
 
     @property
-    def steps_generator(self) -> TeamStatsDownloaderStepsGenerator:
-        return TeamStatsDownloaderStepsGenerator()
+    def steps_generator(self) -> Type[TeamStatsDownloaderStepsGenerator]:
+        return TeamStatsDownloaderStepsGenerator
