@@ -4,7 +4,7 @@ from airflow import Dataset
 from attrs import define
 from downloaders.fbref.entities.base import FBRefDownloaderEntityBase
 from downloaders.fbref.specialized_selenium_steps.player_stats import (
-    PLayerStatsDownloaderStepsGenerator,
+    PlayerStatsDownloaderStepsGenerator,
 )
 
 
@@ -34,5 +34,5 @@ class PlayerStatsPerSeasonFBRef(FBRefDownloaderEntityBase):
         return ["season", "team", "player"]
 
     @property
-    def steps_generator(self) -> Type[PLayerStatsDownloaderStepsGenerator]:
-        return PLayerStatsDownloaderStepsGenerator
+    def steps_generator(self) -> Type[PlayerStatsDownloaderStepsGenerator]:
+        return PlayerStatsDownloaderStepsGenerator

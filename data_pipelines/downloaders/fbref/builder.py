@@ -1,3 +1,4 @@
+import logging
 import os
 
 import attr
@@ -17,12 +18,6 @@ class FBRefDownloader(Downloader):
     This class implements the downloading logic for fbref data.
     """
 
-    def _generate_selenium_steps(self):
-        """
-        Method to generate selenium steps for data extraction.
-        """
-        return self.entity.steps_generator.generate_steps()
-
     def _download_and_save_data(self):
         """
         Method to download and save data from the fbref API.
@@ -30,7 +25,9 @@ class FBRefDownloader(Downloader):
         if not isinstance(self._entity, FBRefDownloaderEntityBase):
             raise ValueError("FBRef Downloader entity must be an instance of FBRefEntityBase")
 
-        selenium_client = SeleniumClient(self.entity.steps_generator)
+        selenium_steps = self.entity.steps_generator().generate_steps()
+        logging.info("Generated %s steps", len(selenium_steps))
+        selenium_client = SeleniumClient(selenium_steps)
         result = selenium_client.execute()
         self.writer.write(result)
 
@@ -44,11 +41,6 @@ class FBRefDownloader(Downloader):
             List of Airflow operators for downloading tasks.
         """
         return [
-            PythonOperator(
-                python_callable=self._generate_selenium_steps,
-                task_id="get_selenium_steps_task_mapping",
-                do_xcom_push=True,
-            ),
             PythonOperator(
                 python_callable=self._download_and_save_data,
                 task_id="download_and_save_data",

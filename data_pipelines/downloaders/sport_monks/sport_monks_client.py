@@ -6,7 +6,7 @@ from typing import Any, Iterator
 import attr
 from downloaders.sport_monks.entities.entity_base import SportMonksDownloaderEntityBase
 
-from data_pipelines.common.api_client_base import ApiClientBase
+from common.api_client_base import ApiClientBase
 
 
 class SportMonksEndpoints(Enum):

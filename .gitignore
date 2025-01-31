@@ -154,6 +154,5 @@ cython_debug/
 
 .idea/
 
-airflow_config/
 mongo_volumes/
 .aider*
