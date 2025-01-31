@@ -72,6 +72,16 @@ class TeamStats:
     goal_keeper_clean_sheets_pct: float
     penalty_kick_saves_pct: float
 
+    @classmethod
+    def create_from_downloaded_hit(cls, **columns):
+        columns = {
+            column: columns.get(column, None)
+            for column in cls.__annotations__.keys()
+        }
+
+        return cls(**columns)
+
+
 
 class TeamStatsDownloaderStepsGenerator(SeleniumStepsGenerator):
     """
@@ -170,7 +180,7 @@ class DownloadSeasonTeamStatsStep(DownloaderSeleniumStep):
 
         general_stats = self.extract_general_stats(general_row)
 
-        team_stats = TeamStats(
+        team_stats = TeamStats.create_from_downloaded_hit(
             season=self.season,
             team_name=team_name,
             finish_position=finish_position,
